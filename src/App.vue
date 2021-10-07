@@ -19,29 +19,41 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        padding-top: 4.5rem;
+        padding-top: 1rem;
 
     }
     .exit-ico{
 
-        width: 3rem;
-        height: 2.5rem;
-        top: -0.7rem;
-        position: absolute;
+        width: 2.1rem;
+        height: 2.3rem;
 
         @media (max-width:768px) {
             transform: scale(1.5);
             top: -0.3rem;
         }
     }
+    .exit{
+        height: 100%;
+        display: flex;
+        align-items: center;
+    }
 
-    .exit, .menu{
-        position: absolute;
-        left: 81%;
-        top: 1.5rem;
+    .actions{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .menu{
         padding: 0.3rem 1.2rem;
         font-size: 1.5rem;
+        height: 8rem;
+        width: 94%;
+        margin: 0 auto;
+        align-items: center;
+        justify-content:space-between;
         color: #092114;
+        display: flex;
         border-radius: 2rem;
     }
 
@@ -88,8 +100,17 @@
 
     .filtration {
         display: flex;
-        justify-content: flex-end;
+        justify-content: space-between;
         align-items: center;
+
+        &__right{
+        display: flex;
+        align-items: center;
+        }
+         &__left{
+        display: flex;
+        align-items: center;
+        }
 
         select {
             width: 20rem;
@@ -107,6 +128,20 @@
 
             option {
                 font-size: 1.7rem;
+                background:rgba(226, 226, 226, 0.651);
+            }
+        }
+
+        .main-select{
+             background:transparent;
+             font-size: 2.2rem;
+             width:27rem;
+             margin-left: 1rem;
+
+             option {
+                font-size: 1.9rem;
+                background:rgba(226, 226, 226, 0.651);
+                margin:0.5rem;
             }
         }
 
@@ -253,6 +288,8 @@
     h1 {
         font-family: serif;
         font-size: 4rem;
+        color:#27382b;
+        margin-top:0.5rem;
         margin-bottom: 0.5rem;
 
         @media (max-width: 768px) {

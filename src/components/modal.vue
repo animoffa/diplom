@@ -42,7 +42,7 @@
 
     .modal-title {
         font-size: 2.4rem;
-        margin-bottom: 5rem;
+        margin-bottom: 4rem;
     }
 
     .modal-shadow {
@@ -135,12 +135,15 @@
         textarea:focus ~ .plus {
             opacity: 1;
         }
-
+        .textarea-container__editor{
+            padding-top:1rem;
+            width: 100%;
+        }
 
 
         textarea {
             height: auto;
-            min-height: 8rem;
+            min-height: 15rem;
         }
 
         .score {
@@ -150,7 +153,7 @@
 
         .mark-container {
             display: flex;
-            justify-content: start;
+            justify-content: space-between;
             border-bottom: 1px solid #d4d4d4;
             border-top: 1px solid #d4d4d4;
             align-items: center;
@@ -158,6 +161,15 @@
 
             span {
                 font-size: 1.9rem;
+            }
+            .mark__our{
+                display: flex;
+                justify-content: flex-start;
+                flex-direction: column;
+                span{
+                    font-size: 1.7rem;
+                    text-align: left;
+                }
             }
         }
 
@@ -168,19 +180,30 @@
         li {
             text-align: initial;
             list-style: inside circle;
-            font-size: 1.9rem;
+            font-size: 1.5rem;
             width: 100%;
             margin: 0.5rem 0;
-            display: block;
+            display: flex;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eeeeee;
 
             &:first-letter {
                 text-transform: uppercase;
             }
         }
-        .open-book__li::before {
-            content: '°';
-            padding-top: 0.7rem;
-            font-size: 2.5rem;
+        .open-book__content{
+            width: 90%;
+            margin-left: 3rem;
+            display: flex;
+            flex-direction: column;
+        }
+        .open-book__img {
+            width: 5.5rem;
+            height: 5.5rem;
+        }
+        .open-book__buttons{
+            display: flex;
+            justify-content: flex-end;
         }
         .open-book__li {
             width: 100%;
@@ -188,8 +211,9 @@
             margin-bottom:3rem;
 
             span {
-                width: 80%;
-                padding: 0.2rem 1rem;
+                width: 100%;
+                font-size: 1.8rem;
+                padding: 0.2rem 1rem 1.5rem;
                 min-height: 4.5rem;
                 display: block;
 
@@ -197,15 +221,26 @@
                     text-transform: uppercase;
                 }
             }
+            
 
             button {
                 opacity: 0;
-                width: 10%;
+                width: 7%;
+                background-color:transparent;
                 border: none;
-                background: #f7ebcf;
-                color: tan;
-                font-size: 2.7rem;
+                font-size: 1.7rem;
                 transition: 1s;
+                margin: 0 1.5rem;
+
+                div {
+                    font-size: 1.7rem;
+                    &:hover{
+                        color: rgb(0, 128, 0);
+                    }
+                }
+                &:last-child div:hover{
+                    color: rgb(177, 0, 0);
+                }
             }
 
             .delete-quote__button {
@@ -221,20 +256,8 @@
                 opacity: 1;
             }
 
-            button:hover {
-                color: #ffd94f;
-            }
 
             .delete-quote__button:hover {
-                color: white;
-            }
-        }
-        .open-book__li:first-child{
-            button {
-                color: #ffd94f;
-            }
-
-            .delete-quote__button {
                 color: white;
             }
         }

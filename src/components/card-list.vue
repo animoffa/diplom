@@ -49,16 +49,13 @@
 
         <modal-window ref="addBookModal">
             <template v-slot:title>
-                <h3 class="modal-title">Добавить книгу</h3>
+                <h3 class="modal-title">Новая статья</h3>
             </template>
             <template v-slot:body>
                 <form @submit.prevent="onSubmit">
                     <div class="modal-body">
-                        <input class="modal_input" placeholder="Название книги" v-model.trim="title"/>
-                        <input placeholder="Автор" v-model.trim="author"/>
-                        <div class="mark-container"><span>Ваша оценка: </span>
-                            <Stars v-bind:mark="mark" @change-mark="setMark"/>
-                        </div>
+                        <input class="modal_input" placeholder="Название" v-model.trim="title"/>
+                        
 
                         <ul v-for="(item,i) of quotes" v-bind:key="i" v-bind:quote="item">
                             <li>{{item}}</li>
@@ -66,14 +63,12 @@
 
                         <form @submit.prevent="onAddQuote">
                             <div class="textarea-container">
-                    <textarea placeholder="Добавить цитату" v-model.trim="quote">
-                    </textarea>
-                                <button class="modal-button plus" type="submit">+</button>
+                                <ckeditor v-model="quote" class="textarea-container__editor"></ckeditor>
                             </div>
                         </form>
                     </div>
 
-                    <button class="modal-button" type="submit">Создать</button>
+                    <button class="modal-button" type="submit">Опубликовать</button>
                 </form>
             </template>
         </modal-window>
@@ -88,8 +83,14 @@
                         <div class="title"> {{card.title}}</div>
                         <div class="subtitle"> {{card.author}}</div>
                         <p class="article__body">{{card.text}}</p>
-                        <div class="mark-container"><span>Оцените статью: </span>
-                        <Stars v-bind:mark="card.mark" @change-mark="changeMark"/>
+                        <div class="mark-container">
+                            <div class="mark__my">
+                                <span>Оцените статью: </span>
+                                <Stars v-bind:mark="card.userMark" @change-mark="changeMark"/>
+                            </div>
+                            <div class="mark__our">
+                                <span>Общая оценка: <strong>{{card.mark}}</strong></span><span>Оценили {{card.countOfMark}} человек</span>
+                            </div>
                         </div>
                         <form @submit.prevent="onAddQuoteInExistingBook">
                             <div class="textarea-container">
@@ -100,11 +101,17 @@
                         </form>
                         <ul>
                             <li class="open-book__li" v-for="(item,i) of card.comments" v-bind:key="i"
-                                v-bind:quote="item"><span>{{item.text}}</span>
-                                <!-- <button v-on:click="deleteQuote(item)" class="delete-quote__button">
-                                    <div> ╳</div>
-                                </button> -->
-                                <button v-on:click="setQuoteMain(item)">★</button>
+                                v-bind:quote="item">
+                                <div class="open-book__img"> 
+                                    <img src="../assets/img/user.png"/>
+                                </div>
+                                <div class="open-book__content">
+                                <span>{{item.text}}</span>
+                                <div class="open-book__buttons">
+                                    <button v-on:click="setQuoteMain(item)">👍<div>51</div></button>
+                                    <button class="dislike" v-on:click="setQuoteMain(item)">👎<div>5</div></button>
+                                </div>
+                                </div>
                             </li>
                         </ul>
                     </div>
@@ -256,9 +263,7 @@
                 if (this.title.trim()) {
                     const newCard = {
                         title: this.title,
-                        author: this.author,
-                        mark: this.mark,
-                        quotes: this.quotes
+                        quote: this.quote
                     }
 
                     try {

@@ -9,24 +9,37 @@
             <button v-on:click="isCardMapping=false" v-bind:class="{activeButton:!isCardMapping}">Table</button>
         </div> -->
         <div class="menu">
+          <div class="title">
+            <a href="/"><h1>quickDoc</h1></a>
+          </div>
+          <ul class="menu__nav">
+                <li><a href="/user?tab=profile">Мой профиль</a></li>
+                <li><a href="/user?tab=friends">Друзья</a></li>
+                <li><a href="/user?tab=myArticles">Мои Статьи</a></li>
+            </ul>
+          <div class="actions">
             <div class="user">
                 <div class="img">
-                    <img src="../assets/img/user.png"/>
+                    <router-link to="/user" v-on:click="exit"><img src="../assets/img/user.png"/></router-link>
                 </div>
                 <p class="des un">{{user.fullName}}</p>
             </div>
-            <div v-on:click="exit">
-                <router-link class="route exit" to="/login"><img src="../assets/img/exit.png" class="exit-ico"/>
-                </router-link>
+              <router-link class="route exit" to="/login" v-on:click="exit"><img src="../assets/img/exit.png" class="exit-ico"/>
+              </router-link>
             </div>
         </div>
         <div class="container">
-            <h1>quickDoc</h1>
-            <img src="../assets/img/line.png" class="line"/>
-
-            <!-- <p class="des">Designed by animoffa </p> -->
-
             <div class="filtration">
+              <div class="filtration__left">
+                <select v-model="sortList" class="main-select">
+                    <option value="popular" selected>Популярные статьи</option>
+                    <option value="friends">Статьи друзей</option>
+                    <option value="my">Мои статьи</option>
+                    <option value="new">Новые статьи</option>
+                </select>
+                <div class="select-arrow"><img src="../assets/img/arrow_custom.svg"/></div>
+              </div>
+              <div class="filtration__right">
                 <input type="text" v-model.trim="search" class="search-input">
                 <div class="h-line"></div>
                 <select v-model="sortParam">
@@ -39,6 +52,7 @@
                     <option value="markLowFirst">по рейтингу ↑</option>
                 </select>
                 <div class="select-arrow"><img src="../assets/img/arrow_custom.svg"/></div>
+              </div>
             </div>
             <hr class="m-hr" v-show="isCardMapping"/>
             <CardList v-bind:cards="sortedList" v-bind:isCardMapping="isCardMapping"></CardList>
@@ -58,6 +72,7 @@
                 search: '',
                 sortParam: '',
                 isCardMapping: true,
+                sortList:'popular',
                 user: '',
                 isLoading: false,
                 resourceFetchStatus: {},
@@ -112,6 +127,8 @@
     "date": "12.12.2020",
     "genre": "Роман",
     "mark": 5,
+    "userMark":3,
+    "countOfMark":10,
     "text": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
     "comments": [
       {text:"Тот, кто любит, должен разделять участь того, кого он любит.", likes:23, dislakes:1, author:""},
@@ -378,6 +395,7 @@
   }
 ]
             },
+
             filtredCards() {
                 const searchByTitle = (item) => item.title.toUpperCase().indexOf(this.search.toUpperCase()) !== -1;
                 const searchByAuthor = (item) => item.author.toUpperCase().indexOf(this.search.toUpperCase()) !== -1;
@@ -420,14 +438,28 @@
         font-size: 1.8rem;
         margin-right: 1rem;
         width: 8rem;
+        height:100%;
         display: flex;
         flex-direction: column;
+        justify-content: center;
         align-items: center;
+    }
+     .menu__nav{
+        display: flex;
+
+        a{
+            font-size: 1.7rem;
+            margin: 0 2rem;
+            color:#27382b;
+        }
+        a:hover{
+            color:#47664e;
+        }
     }
 
     .img {
-        width: 2.5rem;
-        height: 3rem;
+        width: 3rem;
+        height: 2.3rem;
         @media (max-width: 768px) {
             width: 4.5rem;
             height: 4.5rem;
