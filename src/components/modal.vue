@@ -223,17 +223,21 @@
             }
             
 
-            button {
+            .mark-comment {
                 opacity: 0;
                 width: 7%;
                 background-color:transparent;
                 border: none;
+                display:flex;
+                cursor: pointer;
+                align-items: center;
                 font-size: 1.7rem;
                 transition: 1s;
                 margin: 0 1.5rem;
 
                 div {
-                    font-size: 1.7rem;
+                    margin-left: 1rem;
+                    font-size: 1.4rem;
                     &:hover{
                         color: rgb(0, 128, 0);
                     }
@@ -252,7 +256,7 @@
 
         .open-book__li:hover {
 
-            button {
+            .mark-comment {
                 opacity: 1;
             }
 

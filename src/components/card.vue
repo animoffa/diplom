@@ -5,7 +5,7 @@
             <p class="subtitle">{{card.author}}</p>
             <p class="preview">{{card.text}}</p>
             <div class="actions">
-                <Stars :mark="card.mark" @change-mark="changeMark"/>
+                <Stars :mark="card.mark"/>
                 <!-- <div class="more-img-container">
                     <img src="../assets/img/more.svg" alt="actions"/>
                 </div> -->
@@ -49,15 +49,12 @@
         },
         props: ["card"],
         methods: {
-            changeMark(newMark) {
-                this.$emit('change-mark', newMark, this.card._id);
-            },
             deleteBook() {
                 this.isDeleteClicked = !this.isDeleteClicked
-                this.$emit('delete-card', this.card._id);
+                this.$emit('delete-card', this.card.id);
             },
             openMore() {
-                this.$emit('open-more', this.card._id);
+                this.$emit('open-more', this.card.id);
             },
             firstLetterToUppercase(str){
                 return str[0].toUpperCase() + str.slice(1)
@@ -77,6 +74,7 @@
         width: 100%;
         height: 100%;
         position:relative;
+        cursor: pointer;
         overflow: hidden;
         display: flex;
         flex-direction: column;

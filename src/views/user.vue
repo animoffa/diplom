@@ -11,14 +11,14 @@
             <ul class="menu__nav">
                 <li><a href="/">Популярные статьи</a></li>
                 <li><a href="/">Новые</a></li>
-                <li><a href="/">Статьи друзей</a></li>
+                <!-- <li><a href="/">Статьи друзей</a></li> -->
             </ul>
             <div class="actions">
                 <div class="user">
                 <div class="img">
                     <router-link to="/user" v-on:click="exit"><img src="../assets/img/user.png"/></router-link>
                 </div>
-                <p class="des un">{{user}}</p>
+                <p class="des un">имя</p>
             </div>
                 <router-link class="route exit" to="/login" v-on:click="exit"><img src="../assets/img/exit.png" class="exit-ico"/>
                 </router-link>
@@ -35,7 +35,10 @@
 
                 </div>
                 <div class="content">
-                    
+                    <component
+                        :is="bigTabItemsFactory(this.activeTab)"
+                        :key="`${this.activeTab}-block`"
+                        />
                 </div>
             </div>
             </div>
@@ -43,15 +46,17 @@
     </div>
 </template>
 <script>
+    import ProfileComponent from '@/components/ProfileComponent';
+    import EditArticles from '@/components/EditArticles';
+
     export default {
         data() {
             return {
-                sidebarList:[{name:'Профиль', query:'profile'}, {name:'Мои статьи', query:'myArticles'},{name:'Друзья', query:'friends'}],
+                sidebarList:[{name:'Профиль', query:'profile'}, {name:'Редактирование статей', query:'myArticles'}],
                 isLoading: false,
-                activeTab: 'Профиль',
+                activeTab: 'profile',
             }
         },
-        
 
         async mounted() {
             if (this.$route.query.tab) {
@@ -72,6 +77,18 @@
             changeTab(item) {
                 this.activeTab = item;
                 this.$router.push({ query: { tab: item }})
+            },
+            bigTabItemsFactory(item) {
+                switch(item) {
+                    case 'profile':
+                        return ProfileComponent;
+                    // case 'friends':
+                    //     return FriendsComponent;
+                    case 'myArticles':
+                        return EditArticles;
+                    default:
+                        return ProfileComponent;
+                }
             }
             
         },
@@ -111,7 +128,7 @@
         flex-direction: column;
         border-radius: 1rem;
         align-items: flex-start;
-        padding: 4.5rem 3rem 4rem;
+        padding: 6rem 7rem 6rem;
     }
     .sidebar{
         width:22%;
@@ -120,6 +137,7 @@
         -webkit-box-shadow: 10px 9px 18px 10px rgba(207, 207, 207, 27%);
         -moz-box-shadow: 10px 9px 18px 10px rgba(207, 207, 207, 27%);
         display: flex;
+        height: fit-content;
         flex-direction: column;
         border-radius: 1rem;
         align-items: flex-start;
@@ -144,6 +162,7 @@
         font-size: 1.8rem;
         margin-right: 1rem;
         width: 8rem;
+        margin-top: 1.3rem;
         height:100%;
         display: flex;
         flex-direction: column;

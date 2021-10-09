@@ -312,8 +312,6 @@
     .des {
         font-size: 1.4rem;
         color: #68696d;
-        line-height: 2rem;
-        margin-bottom: 1rem;
 
         @media (max-width: 768px) {
             font-size:1.7rem;

@@ -1,50 +1,11 @@
 <template>
     <div v-bind:class="{modalBack:isOpen}">
-        <div class="table-item head" v-show="!isCardMapping">
-            <div class="table-title">
-              Название
-            </div>
-            <div class="author">
-              Автор
-            </div>
-            <div class="stars">
-                Оценка
-            </div>
-            <div class="delete-button">
-                <div> </div>
-            </div>
-            <div class="edit-button">
-
-            </div>
-        </div>
-        <div class="books-container" v-if="isCardMapping">
-            <Card v-for="(card,i) in cards" v-bind:key="i" v-bind:card="card" @delete-card="deleteCard"
+        <div class="books-container">
+            <Card v-for="(card,i) in cards" v-bind:key="i" v-bind:card="card"
                   v-scroll="onPageDown" v-on:scroll="onPageDown"
                   @open-more="openMore" class="card-container"/>
         </div>
-        <div class="books-container-table" v-else>
-            <tableItem v-for="(card,i) in displayedPosts" v-bind:key="i" v-bind:card="card"
-                       @delete-card="deleteCard" @open-more="openMore"></tableItem>
-            <nav class="pagination">
-                <ul>
-                    <li class="page-item">
-                        <button type="button" class="page-link page-arrow prev" v-if="page !== 1" @click="page--"> ←
-                        </button>
-                    </li>
-                    <li class="page-item">
-                        <button type="button" class="page-link" v-for="pageNumber in pages.slice(page-1, page+5)"
-                                v-bind:class="{activePage:page===pageNumber}" v-bind:key="pageNumber"
-                                @click="page = pageNumber "> {{pageNumber}}
-                        </button>
-                    </li>
-                    <li class="page-item">
-                        <button type="button" @click="page++" v-if="page < pages.length"
-                                class="page-link page-arrow next"> →
-                        </button>
-                    </li>
-                </ul>
-            </nav>
-        </div>
+
         <div class="add-card" id="show-modal" @click="showModal">+</div>
 
         <modal-window ref="addBookModal">
@@ -92,7 +53,7 @@
                                 <span>Общая оценка: <strong>{{card.mark}}</strong></span><span>Оценили {{card.countOfMark}} человек</span>
                             </div>
                         </div>
-                        <form @submit.prevent="onAddQuoteInExistingBook">
+                        <form @submit.prevent="addComment">
                             <div class="textarea-container">
                     <textarea placeholder="Добавить комментарий" v-model="quote">
                     </textarea>
@@ -108,8 +69,8 @@
                                 <div class="open-book__content">
                                 <span>{{item.text}}</span>
                                 <div class="open-book__buttons">
-                                    <button v-on:click="setQuoteMain(item)">👍<div>51</div></button>
-                                    <button class="dislike" v-on:click="setQuoteMain(item)">👎<div>5</div></button>
+                                    <div class="mark-comment" @click="setLikeOnComment(item)">👍<div>{{item.likes}}</div></div>
+                                    <div class="mark-comment dislike" @click="setDislikeOnComment(item)">👎<div>{{item.dislikes}}</div></div>
                                 </div>
                                 </div>
                             </li>
@@ -124,10 +85,9 @@
 
 <script>
     import Card from "@/components/card"
-    import tableItem from "@/components/table-item"
     import ModalWindow from "@/components/modal"
     import Stars from "@/components/stars"
-    import API, {APIServiceResource} from "@/services/APIServiceResource"
+    //import API, {APIServiceResource} from "@/services/APIServiceResource"
 
 
     const isScrolledIntoView = (el) => {
@@ -148,9 +108,6 @@
                 quote: '',
                 card: {},
                 search: '',
-                page: 1,
-                perPage: 9,
-                pages: [],
 
             }
         },
@@ -158,14 +115,9 @@
             Card,
             ModalWindow,
             Stars,
-            tableItem
         },
-        computed: {
-            displayedPosts() {
-                return this.paginate(this.cards);
-            }
-        },
-        props: ["cards", "isCardMapping"],
+
+        props: ["cards"],
         directives: {
             scroll: {
                 inserted(element, binding) {
@@ -194,58 +146,42 @@
                 }
                 return isScrolledIntoView(element)
             },
+            setLikeOnComment(i) {
+                this.card.comments.forEach((comment) => {
+                   if (comment.text===i.text) {
+                       comment.likes++;
+                   }
+                })
+            },
+            setDislikeOnComment(i) {
+                this.card.comments.forEach((comment) => {
+                   if (comment.text===i.text) {
+                       comment.dislikes++;
+                   }
+                })
+            },
 
             async changeMark(newMark) {
-                this.card.mark = newMark;
-                const index = this.cards.indexOf(this.card)
-                try {
-                    const res = await API.updateResource(APIServiceResource.ResourceType.books, this.card._id, this.card)
-                    await this.cards.splice(index, 1, res.json())
+                this.card.userMark = newMark;
+                // const index = this.cards.indexOf(this.card)
+                // try {
+                //     const res = await API.updateResource(APIServiceResource.ResourceType.books, this.card._id, this.card)
+                //     await this.cards.splice(index, 1, res.json())
 
-                } catch (e) {
-                    console.error("Error while fetching: " + e.toString());
-                }
+                // } catch (e) {
+                //     console.error("Error while fetching: " + e.toString());
+                // }
             },
-            async onAddQuoteInExistingBook() {
-                this.card.quotes.push(this.quote)
-                await this.changeQuotes()
+            async addComment() {
+                this.card.comments.push({text:this.quote})
                 this.quote = ''
-            },
-            async deleteCard(id) {
-                this.cards = this.cards.filter(book => book._id !== id);
+                // try {
+                //     const res = await API.updateResource(APIServiceResource.ResourceType.books, this.card._id, this.card)
+                //     await this.cards.splice(index, 1, res.json())
 
-                try {
-                    await API.deleteResource(APIServiceResource.ResourceType.books, id);
-                } catch (e) {
-                    console.error("Error while fetching: " + e.toString());
-                }
-            },
-            async deleteQuote(item) {
-                this.card.quotes = this.card.quotes.filter(quote => quote !== item);
-                await this.changeQuotes()
-            },
-            async changeQuotes() {
-                let index = this.cards.indexOf(this.card)
-                try {
-                    const res = await API.updateResource(APIServiceResource.ResourceType.books, this.card._id, this.card)
-                    await this.cards.splice(index, 1, res.json())
-
-                } catch (e) {
-                    console.error("Error while fetching: " + e.toString());
-                }
-            },
-            setMark(newMark) {
-                this.mark = newMark
-            },
-            async setQuoteMain(item) {
-                this.card.quotes = this.card.quotes.filter(quote => quote !== item);
-                this.card.quotes.unshift(item)
-                await this.changeQuotes()
-            },
-
-            onAddQuote() {
-                this.quotes.push(this.quote)
-                this.quote = ''
+                // } catch (e) {
+                //     console.error("Error while fetching: " + e.toString());
+                // }
             },
 
             showModal() {
@@ -254,7 +190,8 @@
                 window.document.body.classList.add("modal-active")
             },
             openMore(id) {
-                this.card = this.cards.find(item => item._id === id)
+                console.log(id);
+                this.card = this.cards.find(item => item.id === id)
                 this.$refs.openBookModal.show = true
                 this.isOpen = !this.isOpen
                 window.document.body.classList.add("modal-active")
@@ -263,46 +200,23 @@
                 if (this.title.trim()) {
                     const newCard = {
                         title: this.title,
-                        quote: this.quote
+                        text: this.quote
                     }
+                    this.cards.push(newCard)
 
-                    try {
-                        const res = await API.createResource(APIServiceResource.ResourceType.books, newCard)
-                        await this.cards.push(await res.json())
-                    } catch (e) {
-                        console.error("Error while fetching: " + e.toString());
-                    }
+                    // try {
+                    //     const res = await API.createResource(APIServiceResource.ResourceType.books, newCard)
+                    //     await this.cards.push(await res.json())
+                    // } catch (e) {
+                    //     console.error("Error while fetching: " + e.toString());
+                    // }
 
                     this.title = ""
-                    this.author = ""
-                    this.quotes = []
-                    this.mark = 0
                     this.quote = ''
 
                 }
             },
 
-            setPages() {
-                let numberOfPages = Math.ceil(this.cards.length / this.perPage);
-                this.pages = [];
-                for (let index = 1; index <= numberOfPages; index++) {
-                    this.pages.push(index);
-                }
-            },
-            paginate(cards) {
-                let page = this.page;
-                let perPage = this.perPage;
-                let fromq = (page * perPage) - perPage;
-                let to = (page * perPage);
-                return cards.slice(fromq, to);
-            },
-
-        },
-
-        watch: {
-            cards() {
-                this.setPages();
-            }
         },
     }
 
@@ -316,57 +230,7 @@
         margin-bottom: 5rem;
         margin-top: 5rem;
     }
-    .books-container-table {
-        display: flex;
-        flex-direction: column;
 
-        .page-link {
-            font-size: 2rem;
-            color: #22331d;
-            padding: 0.5rem 1.5rem;
-            font-weight: 500;
-            background: #e9f1eca3;
-            font-family: auto, serif;
-            margin: 0.2rem;
-            border: none;
-        }
-        .page-arrow {
-            font-size: 1.9rem;
-        }
-
-        .activePage {
-            font-weight: bold;
-            background: #d5e4d9cc;
-        }
-
-        .prev {
-            border-bottom-left-radius: 1.5rem;
-            border-top-left-radius: 1.5rem;
-        }
-
-        .next {
-            border-bottom-right-radius: 1.5rem;
-            border-top-right-radius: 1.5rem;
-        }
-
-        .pagination {
-            top: 93rem;
-            left: 50%;
-            margin-bottom: 10rem;
-            transform: translateX(-50%);
-            position: absolute;
-            margin-top: 2rem;
-
-            ul {
-                display: flex;
-                justify-content: center;
-            }
-
-            @media (max-width: 768px) {
-                top: 109rem;
-            }
-        }
-    }
     .edit-button{
         background:none;
     }

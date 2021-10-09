@@ -1,16 +1,13 @@
 <template>
-    <div class="table-item">
-        <div class="table-title">
-            {{card.title}}
+    <div class="friend">
+        <div class="friend__photo">
+                <img src="../assets/img/user.png"/>
         </div>
-        <div class="author">
+        <div class="friend__name">
             {{card.author}}
         </div>
-        <div class="delete-button" v-on:click="deleteBook" >
+        <div class="delete-button" v-on:click="deleteFriend" >
             <div> ╳</div>
-        </div>
-        <div class="edit-button" v-on:click="openMore">
-
         </div>
     </div>
 </template>
@@ -19,17 +16,16 @@
     export default {
         data() {
             return {
-
+                friend: {
+                    name: 'fdfdf',
+                    lastName:'fdfdfdf',
+                }
             }
         },
         props: ["card"],
         methods: {
-            deleteBook() {
-                this.isDeleteClicked = !this.isDeleteClicked
+            deleteFriend() {
                 this.$emit('delete-card', this.card.id);
-            },
-            openMore() {
-                this.$emit('open-more', this.card._id);
             }
         },
 
