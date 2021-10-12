@@ -281,6 +281,7 @@
         }
         .subtitle{
             text-align: initial;
+            font-size: 1.7rem;
         }
         .line {
             width: 40%;

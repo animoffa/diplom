@@ -91,6 +91,7 @@
             // }
             // this.fetchResource();
             // this.fetchAccountInfo();
+            //загрузка контента в зависимости от sortList
 
         },
         methods: {
@@ -399,7 +400,6 @@
             filtredCards() {
                 const searchByTitle = (item) => item.title.toUpperCase().indexOf(this.search.toUpperCase()) !== -1;
                 const searchByAuthor = (item) => item.author.toUpperCase().indexOf(this.search.toUpperCase()) !== -1;
-                console.log(this.articles);
                 return this.articles.filter(item => searchByTitle(item) || searchByAuthor(item));//заменить articles на то, что на самом деле приходит
             },
             sortedList() {
@@ -430,6 +430,13 @@
                 }
             }
         },
+        watch: {
+          sortList() {
+            this.$router.push({query: {list: this.sortList}})
+            // запрос на новый список
+          
+          }
+        }
     }
 </script>
 

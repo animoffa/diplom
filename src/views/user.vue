@@ -141,14 +141,15 @@
         flex-direction: column;
         border-radius: 1rem;
         align-items: flex-start;
-        padding: 4.5rem 2.5rem 4rem;
+        padding: 4.5rem 2rem 4rem;
         ul{
             width: 100%;
         }
         li{
             font-size: 2.2rem;
             margin: 0.5rem 0;
-            padding: 1rem 1.5rem;
+            transition:0.5s;
+            padding: 1rem 2rem;
             cursor: pointer;
             text-align: left;
             width: 100%;

@@ -213,10 +213,10 @@
     }
 
     * {
-        font-size: 2.2rem;
         box-sizing: border-box;
         line-height: 3rem;
     }
+    
 
     :root {
         --swiper-theme-color: black;

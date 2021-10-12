@@ -2,7 +2,7 @@
     <div class="profile">
         <div class="profile__main">
             <div class="profile__photo">
-                <img src="../assets/img/user.png"/>
+                <img src="../assets/img/userBig.png"/>
             </div>
             <div class="profile__main-info">
                 <div class="field"><strong v-show="showEdit">{{content.name}}</strong><input v-show="!showEdit" v-model="content.name"/></div>
@@ -12,8 +12,8 @@
             </div>
             </div>
             <div class="profile__full-info">
-                <p>E-mail: <span v-show="showEdit">{{content.mail}}</span><input v-show="!showEdit" v-model="content.mail"/></p>
-                <p>Телефон: <span v-show="showEdit">{{content.phone}}</span><input v-show="!showEdit" v-model="content.phone"/></p>
+                <p>E-mail: <a v-show="showEdit" :href="'mailto:'+content.mail">{{content.mail}}</a><input v-show="!showEdit" v-model="content.mail"/></p>
+                <p>Телефон: <a v-show="showEdit" :href="'tel:'+content.phone">{{content.phone}}</a><input v-show="!showEdit" v-model="content.phone"/></p>
                 <p>Адрес: <span v-show="showEdit">{{content.address}}</span><input v-show="!showEdit" v-model="content.address"/></p>
                 <p>Количество статей: <span v-show="showEdit">{{content.countOfArticle}}</span><input v-show="!showEdit" v-model="content.countOfArticle"/></p>
                 <p>О себе: <span v-show="showEdit">{{content.about}}</span><textarea v-show="!showEdit" v-model="content.about"/></p>
@@ -74,6 +74,46 @@
         width:100%;
         &-button{
             margin-top: 5rem;
+        }
+        a {
+            line-height: 145%;
+            font-size: 1.9rem;
+            margin-left: 1rem;
+            bottom: 0.5rem;
+            color:#27382b;
+            transition:0.3s;
+            cursor: pointer;
+            position: relative;
+            white-space: nowrap;
+            &:hover{
+                color:#3CB3E7;
+                &::before{
+                    width: 100%;
+                }
+            }
+
+            &:after {
+            background: transparent url('../assets/img/link-arrow-text_blue.svg') 0 0 no-repeat;
+            background-size: 16px;
+            content: " ";
+            display: inline-block;
+            height: 15px;
+            margin-left: 0.5rem;
+            width: 20px;
+            box-sizing: border-box;
+            }
+            &:before {
+                content: '';
+                bottom: 0;
+                display: block;
+                position: absolute;
+                width: 0;
+                right: 0;
+                height: 1px;
+                background-color: #3CB3E7;
+                transition: 0.3s ease;
+            }
+
         }
         
         .field{

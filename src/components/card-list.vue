@@ -5,7 +5,7 @@
                   v-scroll="onPageDown" v-on:scroll="onPageDown"
                   @open-more="openMore" class="card-container"/>
         </div>
-
+        <div class="more-cards" id="more" @click="showMore">Показать ещё</div>
         <div class="add-card" id="show-modal" @click="showModal">+</div>
 
         <modal-window ref="addBookModal">
@@ -43,7 +43,7 @@
                     <div class="modal-body">
                         <div class="title"> {{card.title}}</div>
                         <div class="subtitle"> {{card.author}}</div>
-                        <p class="article__body">{{card.text}}</p>
+                        <p class="article__body" v-html="card.text"></p>
                         <div class="mark-container">
                             <div class="mark__my">
                                 <span>Оцените статью: </span>
@@ -108,6 +108,7 @@
                 quote: '',
                 card: {},
                 search: '',
+                page: 1,
 
             }
         },
@@ -136,7 +137,21 @@
                 }
             }
         },
+        mounted() {
+            this.onPageDown();
+        },
         methods: {
+            showMore() {
+                this.page += 1;
+                //const tab = this.$route.query.list || 'popular';
+                
+                // this.$accessor.bonuses.getBonusData({
+                //     page,
+                //     tab: tab,
+                //     overwrite: overwriteBonusCards,
+                // });
+
+            },
             onPageDown(e, element) {
                 if (isScrolledIntoView(element)) {
                     element.setAttribute(
@@ -199,7 +214,7 @@
             async onSubmit() {
                 if (this.title.trim()) {
                     const newCard = {
-                        title: this.title,
+                        title: this.title,  
                         text: this.quote
                     }
                     this.cards.push(newCard)
@@ -224,11 +239,68 @@
 </script>
 
 <style lang="less" scoped>
+    .more-cards{
+        padding: 1.5rem 3rem;
+        border: 1px solid #27382b;
+        color: #27382b;
+        border-radius: 3rem;
+        font-size: 1.8rem;
+        margin: 1rem auto;
+        cursor: pointer;
+        width: fit-content;
+        &:hover {
+            border: 1px solid #5a8664;
+            color: #4c7255;
+        }
+    }
     .article__body {
         text-align: left;
         font-size: 1.7rem;
         margin-bottom: 5rem;
         margin-top: 5rem;
+
+        a {
+            line-height: 145%;
+            font-size: 1.9rem;
+            margin-left: 1rem;
+            bottom: 0.5rem;
+            color:#27382b;
+            transition:0.3s;
+            cursor: pointer;
+            position: relative;
+            white-space: nowrap;
+
+            &:hover{
+                color:#3CB3E7;
+                &::before{
+                    width: 100%;
+                }
+            }
+
+            &:after {
+            background: transparent url('../assets/img/link-arrow-text_blue.svg') 0 0 no-repeat;
+            background-size: 16px;
+            content: " ";
+            display: inline-block;
+            height: 15px;
+            margin-left: 0.5rem;
+            width: 20px;
+            box-sizing: border-box;
+            }
+
+            &:before {
+                content: '';
+                bottom: 0;
+                display: block;
+                position: absolute;
+                width: 0;
+                right: 0;
+                height: 1px;
+                background-color: #3CB3E7;
+                transition: 0.3s ease;
+            }
+
+        }
     }
 
     .edit-button{
@@ -290,7 +362,7 @@
         font-size: 3rem;
         background: #477251;
         cursor: pointer;
-        transition: 1.5s;
+        transition: 0.7s;
         box-shadow: 0 0 0.3rem 2.5rem #4772519e, 0 0 0.3rem 4.1rem #4772513b, 0 0 0.3rem 1.2rem #477251cc;
     }
 

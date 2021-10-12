@@ -3,7 +3,7 @@
         <div class="card front">
             <p class="title">{{card.title}}</p>
             <p class="subtitle">{{card.author}}</p>
-            <p class="preview">{{card.text}}</p>
+            <p class="preview" v-html="card.text"></p>
             <div class="actions">
                 <Stars :mark="card.mark"/>
                 <!-- <div class="more-img-container">
