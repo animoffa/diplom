@@ -191,6 +191,12 @@
                 text-transform: uppercase;
             }
         }
+        .open-book__author {
+            padding-left: 1rem;
+            font-size: 15px;
+            font-weight: 600;
+            color: #477251;
+        }
         .open-book__date {
             display: flex;
             align-items: center;

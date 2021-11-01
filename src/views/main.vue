@@ -132,7 +132,7 @@
     "countOfMark":10,
     "text": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
     "comments": [
-      {text:"Тот, кто любит, должен разделять участь того, кого он любит.", likes:23, dislikes:1, author:""},
+      {text:"Тот, кто любит, должен разделять участь того, кого он любит.", likes:23, dislikes:1, author:{name:"Анастасия", lastName: "Фомина"}},
       "Да, человек смертен, но это было бы еще полбеды. Плохо то, что он иногда внезапно смертен, вот в чем фокус!",
       "зачем же гнаться по следам того, что уже окончено?"
     ]

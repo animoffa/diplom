@@ -67,6 +67,7 @@
                                     <img src="../assets/img/user.png"/>
                                 </div>
                                 <div class="open-book__content">
+                                <p class="open-book__author">{{item.author && item.author.name}} {{item.author && item.author.lastName}}</p>
                                 <span>{{item.text}}</span>
                                 <div class="open-book__buttons">
                                     <div class="mark-comment" @click="setLikeOnComment(item)">👍<div>{{item.likes || 0}}</div></div>
@@ -97,10 +98,12 @@
 
 
     const isScrolledIntoView = (el) => {
+        if (el) {
         const rect = el.getBoundingClientRect();
         const elemTop = rect.top;
         const elemBottom = rect.bottom;
         return (elemTop >= 0) && (elemBottom <= window.innerHeight);
+        }
     }
 
     export default {
