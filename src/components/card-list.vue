@@ -69,8 +69,14 @@
                                 <div class="open-book__content">
                                 <span>{{item.text}}</span>
                                 <div class="open-book__buttons">
-                                    <div class="mark-comment" @click="setLikeOnComment(item)">👍<div>{{item.likes}}</div></div>
-                                    <div class="mark-comment dislike" @click="setDislikeOnComment(item)">👎<div>{{item.dislikes}}</div></div>
+                                    <div class="mark-comment" @click="setLikeOnComment(item)">👍<div>{{item.likes || 0}}</div></div>
+                                    <div class="mark-comment dislike" @click="setDislikeOnComment(item)">👎<div>{{item.dislikes || 0}}</div></div>
+                                    <div class="open-book__date">
+                                        <div class="more-img-container">
+                                            <img src="../assets/img/gray-time.svg"/>
+                                        </div>
+                                        <p>{{card.date}}</p>
+                                    </div>
                                 </div>
                                 </div>
                             </li>

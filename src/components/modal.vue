@@ -191,6 +191,15 @@
                 text-transform: uppercase;
             }
         }
+        .open-book__date {
+            display: flex;
+            align-items: center;
+
+            p {
+                color: #a6b2c8d8;
+                font-size: 1.5rem;
+            }
+        }
         .open-book__content{
             width: 90%;
             margin-left: 3rem;
