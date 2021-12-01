@@ -5,7 +5,7 @@
                   v-scroll="onPageDown" v-on:scroll="onPageDown"
                   @open-more="openMore" class="card-container"/>
         </div>
-        <div class="more-cards" id="more" @click="showMore">Показать ещё</div>
+        <!-- <div class="more-cards" id="more" @click="showMore">Показать ещё</div> -->
         <div class="add-card" id="show-modal" @click="showModal">+</div>
 
         <modal-window ref="addBookModal">
@@ -42,7 +42,7 @@
                 <form>
                     <div class="modal-body">
                         <div class="title"> {{card.title}}</div>
-                        <div class="subtitle"> {{card.author}}</div>
+                        <div class="subtitle"> {{card.author.name}}</div>
                         <p class="article__body" v-html="card.text"></p>
                         <div class="mark-container">
                             <div class="mark__my">
@@ -94,7 +94,7 @@
     import Card from "@/components/card"
     import ModalWindow from "@/components/modal"
     import Stars from "@/components/stars"
-    //import API, {APIServiceResource} from "@/services/APIServiceResource"
+    import API, {APIServiceResource} from "@/services/APIServiceResource"
 
 
     const isScrolledIntoView = (el) => {
@@ -222,18 +222,31 @@
             },
             async onSubmit() {
                 if (this.title.trim()) {
+                    const now = new Date();
                     const newCard = {
                         title: this.title,  
-                        text: this.quote
+                        text: this.quote,
+                        author: {
+                            id:1,
+                            email: 'TESTEMAIL@EMAIL.COM',
+                            password: 123,
+                            name:'qwe',
+                            lastname: 'qwe',
+                            phone: 'qwe',
+                            birthDate: null,
+                            status: 'KEKEKE',
+                            address: 'ADDRESS',
+                            about: 'ABOUT'
+                        },
+                        date: now.toISOString(),
                     }
-                    this.cards.push(newCard)
 
-                    // try {
-                    //     const res = await API.createResource(APIServiceResource.ResourceType.books, newCard)
-                    //     await this.cards.push(await res.json())
-                    // } catch (e) {
-                    //     console.error("Error while fetching: " + e.toString());
-                    // }
+                    try {
+                        const res = await API.createResource(APIServiceResource.ResourceType.articles, newCard)
+                        await this.cards.push(await res.json())
+                    } catch (e) {
+                        console.error("Error while fetching: " + e.toString());
+                    }
 
                     this.title = ""
                     this.quote = ''

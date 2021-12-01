@@ -2,7 +2,7 @@
     <div class="flipcard h" v-bind:class="{deleteSide: isDeleteClicked}" v-on:click="openMore">
         <div class="card front">
             <p class="title">{{card.title}}</p>
-            <p class="subtitle">{{card.author}}</p>
+            <p class="subtitle">{{card.author.name}} {{card.author.lastName}}</p>
             <p class="preview" v-html="card.text"></p>
             <div class="actions">
                 <Stars :mark="card.mark"/>
@@ -13,7 +13,7 @@
                     <div class="more-img-container">
                     <img src="../assets/img/gray-time.svg" alt="actions"/>
                 </div>
-                <p>{{card.date}}</p>
+                <p>{{convertDate(card.date)}}</p>
                 </div>
             </div>
             <!-- <div class="quotes">
@@ -48,6 +48,7 @@
             Stars
         },
         props: ["card"],
+
         methods: {
             deleteBook() {
                 this.isDeleteClicked = !this.isDeleteClicked
@@ -58,6 +59,12 @@
             },
             firstLetterToUppercase(str){
                 return str[0].toUpperCase() + str.slice(1)
+            },
+            convertDate(date) {
+                const formattedDate = new Date(date);
+                const month = (formattedDate.getMonth()+1) < 10 ? '0'+(formattedDate.getMonth()+1) : formattedDate.getMonth();
+                const day= formattedDate.getDate() < 10 ? '0'+formattedDate.getDate() : formattedDate.getDate();
+                return `${day}.${month}.${formattedDate.getFullYear()}`;
             }
         },
 

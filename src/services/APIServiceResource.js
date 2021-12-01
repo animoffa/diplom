@@ -7,14 +7,6 @@ export class APIServiceResource {
         APIServiceResource.instance = this;
     }
 
-    static getInstance(baseUrl) {
-        if (APIServiceResource.instance)
-            return APIServiceResource.instance;
-        if (!baseUrl)
-            throw new Error("Base url is empty!");
-        return APIServiceResource.instance = new APIServiceResource(baseUrl);
-    }
-
     fetch(config, resourceName, id) {
         let url = `${this.baseUrl}/${resourceName}`;
         if (id) url += `/${id}`;
@@ -61,8 +53,7 @@ export class APIServiceResource {
         DELETE: () => ({method: 'DELETE', headers: APIServiceResource.MethodType.getHeaders()}),
     };
 
-    static ResourceType = {books: 'books'};
+    static ResourceType = {articles: 'articles'};
 }
 
-export default new APIServiceResource('http://localhost:3000');
-
+export default new APIServiceResource('http://localhost:8080');

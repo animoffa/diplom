@@ -62,7 +62,7 @@
 </template>
 <script>
     import CardList from "@/components/card-list"
-    // import ResourceAPI, {APIServiceResource} from "@/services/APIServiceResource.js"
+    import ResourceAPI, {APIServiceResource} from "@/services/APIServiceResource.js"
     // import AuthAPI from "@/services/APIServiceAuth.js"
 // import Preloader from "@/components/preloader"
     export default {
@@ -89,7 +89,7 @@
             //     this.redirectToLogin();
             //     return;
             // }
-            // this.fetchResource();
+            this.fetchResource();
             // this.fetchAccountInfo();
             //загрузка контента в зависимости от sortList
 
@@ -98,12 +98,13 @@
             exit() {
                 localStorage.removeItem("token");
             },
-            // async fetchResource() {
-            //     this.isLoading = true;
-            //     const response = await ResourceAPI.getResources(APIServiceResource.ResourceType.books);
-            //     this.cards = await response.json();
-            //     this.isLoading = false;
-            // },
+            async fetchResource() {
+                this.isLoading = true;
+                const response = await ResourceAPI.getResources(APIServiceResource.ResourceType.articles);
+                this.cards = await response.json();
+                console.log(this.cards);
+                this.isLoading = false;
+            },
             // async fetchAccountInfo() {
             //     this.isLoading = true;
             //     const responseAuth = await AuthAPI.getAuth();
@@ -126,7 +127,6 @@
     "title": "Асинхрнонный JS",
     "author": "Булгаков М.А.",
     "date": "12.12.2020",
-    "genre": "Роман",
     "mark": 5,
     "userMark":3,
     "countOfMark":10,
@@ -400,7 +400,7 @@
             filtredCards() {
                 const searchByTitle = (item) => item.title.toUpperCase().indexOf(this.search.toUpperCase()) !== -1;
                 const searchByAuthor = (item) => item.author.toUpperCase().indexOf(this.search.toUpperCase()) !== -1;
-                return this.articles.filter(item => searchByTitle(item) || searchByAuthor(item));//заменить articles на то, что на самом деле приходит
+                return this.cards.filter(item => searchByTitle(item) || searchByAuthor(item));//заменить articles на то, что на самом деле приходит
             },
             sortedList() {
                 const sortByTitle = (d1, d2) => {
