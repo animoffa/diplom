@@ -8,7 +8,7 @@ export class APIServiceResource {
     }
 
     fetch(adrs, config) {
-        const url = `${this.baseUrl}/auth/${adrs}`;
+        const url = `${this.baseUrl}/${adrs}`;
         return fetch(url, config);
     }
 
@@ -17,7 +17,7 @@ export class APIServiceResource {
     }
 
     register(newUser) {
-        return this.fetch(`register`, ({
+        return this.fetch(`registration`, ({
             method: 'POST',
             body: JSON.stringify(newUser),
             headers: APIServiceResource.MethodType.getHeaders()
@@ -35,11 +35,10 @@ export class APIServiceResource {
     static MethodType = {
         getHeaders: () => {
             return {
-                'Content-Type': 'application/json',
-                'Authorization': "Basic " + localStorage.getItem('token')
+                'Content-Type': 'application/json'
             }
         },
     };
 }
 
-export default new APIServiceResource('http://localhost:3000');
+export default new APIServiceResource('http://localhost:8080');

@@ -34,13 +34,13 @@
             localStorage.removeItem("token");
         },
         methods: {
-            async onSubmit() {
+            async onSubmit() {  
                 if (this.login && this.password && this.password.length > 3) {
                     try {
                         console.log("sefs");
-                        const res = await API.login({username: this.login, password: this.password});
-                        const token = this.login + ":" + this.password;
-                        await localStorage.setItem("token", btoa(token));
+                        const res = await API.login({email: this.login, password: this.password});
+                        const json = await res.json();
+                        await localStorage.setItem("token", json.jwt);
                         if (res.status !== 401 && res.status !== 500) {
                             await this.$router.push('/');
                         }

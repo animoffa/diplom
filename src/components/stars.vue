@@ -1,15 +1,15 @@
 <template>
-    <div class="score" v-bind:data-total-value="mark">
-        <div class="star" data-item-value="5" v-on:click="setNewMark(5)">★
+    <div class="score">
+        <div class="star" data-item-value="5" v-on:click="setNewMark(mark)">★
         </div>
-        <div class="star" data-item-value="4" v-on:click="setNewMark(4)">★
+        <!-- <div class="star" data-item-value="4" v-on:click="setNewMark(4)">★
         </div>
         <div class="star" data-item-value="3" v-on:click="setNewMark(3)">★
         </div>
         <div class="star" data-item-value="2" v-on:click="setNewMark(2)">★
         </div>
         <div class="star" data-item-value="1" v-on:click="setNewMark(1)">★
-        </div>
+        </div> -->
     </div>
 </template>
 

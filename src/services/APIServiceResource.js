@@ -15,6 +15,7 @@ export class APIServiceResource {
 
     getResources(resourceName) {
         this.isResourceExists(resourceName);
+        console.log(APIServiceResource.MethodType.GET());
         return this.fetch(APIServiceResource.MethodType.GET(), APIServiceResource.ResourceType[resourceName]);
     }
 
@@ -43,7 +44,7 @@ export class APIServiceResource {
         getHeaders: () => {
             return {
                 'Content-Type': 'application/json',
-                'Authorization': "Basic " + localStorage.getItem('token')
+                'Authentication': "Bearer " + localStorage.getItem('token')
             }
         },
 

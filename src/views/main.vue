@@ -111,13 +111,13 @@
             //     this.user = await responseAuth.json();
             //     this.isLoading = false;
             // },
-            // async redirectToLogin() {
-            //     try {
-            //         await this.$router.push('/login');
-            //     } catch (e) {
-            //         console.error("Error while fetching: " + e.toString());
-            //     }
-            // }
+            async redirectToLogin() {
+                try {
+                    await this.$router.push('/login');
+                } catch (e) {
+                    console.error("Error while fetching: " + e.toString());
+                }
+            }
         },
         computed: {
             articles() {
