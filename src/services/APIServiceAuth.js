@@ -15,6 +15,9 @@ export class APIServiceResource {
     getAuth() {
         return this.fetch(`me`, ({method: 'GET', headers: APIServiceResource.MethodType.getHeaders()}));
     }
+    editUser(User) {
+        return this.fetch(`me`, ({method: 'PUT',body: JSON.stringify(User), headers: APIServiceResource.MethodType.getHeaders()}));
+    }
 
     register(newUser) {
         return this.fetch(`registration`, ({
@@ -35,7 +38,8 @@ export class APIServiceResource {
     static MethodType = {
         getHeaders: () => {
             return {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authentication': "Bearer " + localStorage.getItem('token')
             }
         },
     };

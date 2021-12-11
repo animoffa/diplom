@@ -6,13 +6,13 @@
             </div>
             <div class="profile__main-info">
                 <div class="field"><strong v-show="showEdit">{{content.name}}</strong><input v-show="!showEdit" v-model="content.name"/></div>
-                <div class="field"><strong v-show="showEdit">{{content.lastName}}</strong><input v-show="!showEdit" v-model="content.lastName"/></div>
+                <div class="field"><strong v-show="showEdit">{{content.lastname}}</strong><input v-show="!showEdit" v-model="content.lastname"/></div>
                 <p>Дата рождения: <span v-show="showEdit">{{content.birthDate}}</span><input v-show="!showEdit" v-model="content.birthDate"/></p>
-                <p>Статус: <span v-show="showEdit">{{content.status}}</span><input v-show="!showEdit" v-model="content.status"/></p>
+                <p>Компания: <span v-show="showEdit">{{content.company}}</span><input v-show="!showEdit" v-model="content.company"/></p>
             </div>
             </div>
             <div class="profile__full-info">
-                <p>E-mail: <a v-show="showEdit" :href="'mailto:'+content.mail">{{content.mail}}</a><input v-show="!showEdit" v-model="content.mail"/></p>
+                <p>E-mail: <a v-show="showEdit" :href="'mailto:'+content.email">{{content.email}}</a><input v-show="!showEdit" v-model="content.email"/></p>
                 <p>Телефон: <a v-show="showEdit" :href="'tel:'+content.phone">{{content.phone}}</a><input v-show="!showEdit" v-model="content.phone"/></p>
                 <p>Адрес: <span v-show="showEdit">{{content.address}}</span><input v-show="!showEdit" v-model="content.address"/></p>
                 <p>Количество статей: <span v-show="showEdit">{{content.countOfArticle}}</span><input v-show="!showEdit" v-model="content.countOfArticle"/></p>
@@ -24,45 +24,41 @@
     </div>
 </template>
 <script>
+    import AuthAPI from "@/services/APIServiceAuth.js"
     
+
     export default {
         name: 'profile-component',
-        props: {
-            // content: {
-            //     type: Object,
-            //     default:()=>{
-            //         name: 'rfr'}
-            // }
-        },
         data() {
             return {
                 showEdit: "false",
-                content: {
-                    name: 'fvvfv',
-                    lastName: 'dff',
-                    phone: 'ffffff',
-                    mail:'dsdsdsd',
-                    address:'dfefeferf',
-                    birthDate: 'rf',
-                    countOfArticle: '5',
-                    status: 'dcsdcww erverver erverververv evrevrerv ervervev sdcf',
-                    about: 'loader vfre ererf vgfd eveververv vvdsdfvdv ererverv evervev evevervev eveveveverv evevevevev evervev evevevr ervevescs efwefwfwef wefwefwef rveverv erververv eververvever ververververv'
-                }
+                content: {}
             }
         },
+        asyncData() {
 
+        },
         async mounted() {
-            // if (!localStorage.getItem("token")) {
-            //     this.redirectToLogin();
-            //     return;
-            // }
-            // this.fetchResource();
-            // this.fetchAccountInfo();
+            if (!localStorage.getItem("token")) {
+                this.redirectToLogin();
+                return;
+            }
+            this.fetchAccountInfo();
 
         },
         methods: {
-            saveChanges() {
-
+            async fetchAccountInfo() {
+                this.isLoading = true;
+                const responseAuth = await AuthAPI.getAuth();
+                this.content = await responseAuth.json();
+                console.log('s',this.content);
+                this.isLoading = false;
+            },
+            async saveChanges() {
+                this.isLoading = true;
+                const responseAuth = await AuthAPI.editUser(this.content);
+                console.log('sw', responseAuth);
+                this.isLoading = false;
             }
         }
        

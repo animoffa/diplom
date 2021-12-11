@@ -1,6 +1,6 @@
 <template>
     <div class="score">
-        <div class="star" data-item-value="5" v-on:click="setNewMark(mark)">★
+        <div class="star" :class="{'liked':mark}" v-on:click="setNewMark(mark)">★
         </div>
         <!-- <div class="star" data-item-value="4" v-on:click="setNewMark(4)">★
         </div>
@@ -19,6 +19,7 @@
         props: ["mark"],
         methods: {
             setNewMark(newMark) {
+                console.log('sds');
                 this.$emit('change-mark', newMark);
             }
         },
@@ -45,11 +46,7 @@
         }
     }
 
-    .score[data-total-value="1"] .star:nth-child(n+5),
-    .score[data-total-value="2"] .star:nth-child(n+4),
-    .score[data-total-value="3"] .star:nth-child(n+3),
-    .score[data-total-value="4"] .star:nth-child(n+2),
-    .score[data-total-value="5"] .star:nth-child(n+1) {
+    .score.liked .star {
         color: #272727;
     }
 

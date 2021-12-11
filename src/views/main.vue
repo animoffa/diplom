@@ -22,7 +22,7 @@
                 <div class="img">
                     <router-link to="/user" v-on:click="exit"><img src="../assets/img/user.png"/></router-link>
                 </div>
-                <p class="des un">имя</p>
+                <p class="des un">{{user ? user.name : 'войдите'}}</p>
             </div>
               <router-link class="route exit" to="/login" v-on:click="exit"><img src="../assets/img/exit.png" class="exit-ico"/>
               </router-link>
@@ -32,10 +32,8 @@
             <div class="filtration">
               <div class="filtration__left">
                 <select v-model="sortList" class="main-select">
-                    <option value="popular" selected>Популярные статьи</option>
-                    <!-- <option value="friends">Статьи друзей</option> -->
-                    <option value="my">Мои статьи</option>
-                    <option value="new">Новые статьи</option>
+                    <option value="popular" selected>Все статьи</option>
+                    <option value="company">Cтатьи компании</option>
                 </select>
                 <div class="select-arrow"><img src="../assets/img/arrow_custom.svg"/></div>
               </div>
@@ -55,7 +53,7 @@
               </div>
             </div>
             <hr class="m-hr" v-show="isCardMapping"/>
-            <CardList v-bind:cards="sortedList" v-bind:isCardMapping="isCardMapping"></CardList>
+            <CardList v-bind:cards="sortedList" v-bind:isCardMapping="isCardMapping" :user="user"></CardList>
         </div>
         </template>
     </div>
@@ -63,7 +61,7 @@
 <script>
     import CardList from "@/components/card-list"
     import ResourceAPI, {APIServiceResource} from "@/services/APIServiceResource.js"
-    // import AuthAPI from "@/services/APIServiceAuth.js"
+    import AuthAPI from "@/services/APIServiceAuth.js"
 // import Preloader from "@/components/preloader"
     export default {
         data() {
@@ -73,7 +71,7 @@
                 sortParam: '',
                 isCardMapping: true,
                 sortList:'popular',
-                user: '',
+                user: {},
                 isLoading: false,
                 resourceFetchStatus: {},
                 accountInfoFetchStatus: {}
@@ -85,12 +83,12 @@
         },
 
         async mounted() {
-            // if (!localStorage.getItem("token")) {
-            //     this.redirectToLogin();
-            //     return;
-            // }
+            if (!localStorage.getItem("token")) {
+                this.redirectToLogin();
+                return;
+            }
             this.fetchResource();
-            // this.fetchAccountInfo();
+            this.fetchAccountInfo();
             //загрузка контента в зависимости от sortList
 
         },
@@ -105,12 +103,13 @@
                 console.log(this.cards);
                 this.isLoading = false;
             },
-            // async fetchAccountInfo() {
-            //     this.isLoading = true;
-            //     const responseAuth = await AuthAPI.getAuth();
-            //     this.user = await responseAuth.json();
-            //     this.isLoading = false;
-            // },
+            async fetchAccountInfo() {
+                this.isLoading = true;
+                const responseAuth = await AuthAPI.getAuth();
+                this.user = await responseAuth.json();
+                console.log(this.user);
+                this.isLoading = false;
+            },
             async redirectToLogin() {
                 try {
                     await this.$router.push('/login');

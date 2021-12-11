@@ -112,7 +112,7 @@
                 isOpen: false,
                 title: '',
                 author: '',
-                mark: 0,
+                mark: false,
                 quotes: [],
                 quote: '',
                 card: {},
@@ -127,7 +127,16 @@
             Stars,
         },
 
-        props: ["cards"],
+        props: {
+            cards: {
+                type: Array,
+                required: false,
+            },
+            user: {
+                type: Object,
+                default:()=> {}
+            }
+        },
         directives: {
             scroll: {
                 inserted(element, binding) {
@@ -170,23 +179,27 @@
                 }
                 return isScrolledIntoView(element)
             },
-            setLikeOnComment(i) {
-                this.card.comments.forEach((comment) => {
-                   if (comment.text===i.text) {
-                       comment.likes++;
-                   }
-                })
-            },
-            setDislikeOnComment(i) {
-                this.card.comments.forEach((comment) => {
-                   if (comment.text===i.text) {
-                       comment.dislikes++;
-                   }
-                })
-            },
+            // setLikeOnComment(i) {
+            //     this.card.comments.forEach((comment) => {
+            //        if (comment.text===i.text) {
+            //            comment.likes++;
+            //        }
+            //     })
+            // },
+            // setDislikeOnComment(i) {
+            //     this.card.comments.forEach((comment) => {
+            //        if (comment.text===i.text) {
+            //            comment.dislikes++;
+            //        }
+            //     })
+            // },
 
             async changeMark(newMark) {
-                this.card.userMark = newMark;
+                if (!newMark) {
+                    const newCard = this.card.likeList.push(this.card.id);
+                    const response = await API.updateResource(APIServiceResource.ResourceType.articles, this.card.id, newCard );
+                    console.log(response);
+                }
                 // const index = this.cards.indexOf(this.card)
                 // try {
                 //     const res = await API.updateResource(APIServiceResource.ResourceType.books, this.card._id, this.card)
@@ -226,18 +239,7 @@
                     const newCard = {
                         title: this.title,  
                         text: this.quote,
-                        author: {
-                            id:1,
-                            email: 'TESTEMAIL@EMAIL.COM',
-                            password: 123,
-                            name:'qwe',
-                            lastname: 'qwe',
-                            phone: 'qwe',
-                            birthDate: null,
-                            status: 'KEKEKE',
-                            address: 'ADDRESS',
-                            about: 'ABOUT'
-                        },
+                        author: this.user,
                         date: now.toISOString(),
                     }
 
