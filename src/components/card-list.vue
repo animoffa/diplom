@@ -47,10 +47,11 @@
                         <div class="mark-container">
                             <div class="mark__my">
                                 <span>Оцените статью: </span>
-                                <Stars v-bind:mark="card.userMark" @change-mark="changeMark"/>
+                                <!-- <Stars v-bind:mark="userMark" @change-mark="changeMark"/> -->
+                                <div class="star" :class="{'liked':userMark}" @click="changeMark">★</div>
                             </div>
                             <div class="mark__our">
-                                <span>Общая оценка: <strong>{{card.mark}}</strong></span><span>Оценили {{card.countOfMark}} человек</span>
+                                <span>Оценили {{card.likeList.length}} человек</span>
                             </div>
                         </div>
                         <form @submit.prevent="addComment">
@@ -93,7 +94,6 @@
 <script>
     import Card from "@/components/card"
     import ModalWindow from "@/components/modal"
-    import Stars from "@/components/stars"
     import API, {APIServiceResource} from "@/services/APIServiceResource"
 
 
@@ -118,13 +118,13 @@
                 card: {},
                 search: '',
                 page: 1,
+                userMark: false,
 
             }
         },
         components: {
             Card,
             ModalWindow,
-            Stars,
         },
 
         props: {
@@ -155,10 +155,17 @@
                 }
             }
         },
+
         mounted() {
             this.onPageDown();
         },
         methods: {
+            isUserLikedArticle() {
+                let exist = {};
+                exist = this.card.likeList.find((i)=>{return i.id === this.user.id});
+                this.userMark = Object.keys(exist).length === 0 ? false : true;
+                console.log(this.userMark);
+            },
             showMore() {
                 this.page += 1;
                 //const tab = this.$route.query.list || 'popular';
@@ -194,21 +201,15 @@
             //     })
             // },
 
-            async changeMark(newMark) {
-                if (!newMark) {
-                    const newCard = this.card.likeList.push(this.card.id);
-                    const response = await API.updateResource(APIServiceResource.ResourceType.articles, this.card.id, newCard );
-                    console.log(response);
-                }
-                // const index = this.cards.indexOf(this.card)
-                // try {
-                //     const res = await API.updateResource(APIServiceResource.ResourceType.books, this.card._id, this.card)
-                //     await this.cards.splice(index, 1, res.json())
-
-                // } catch (e) {
-                //     console.error("Error while fetching: " + e.toString());
-                // }
+            async changeMark() {
+                    const res = await API.updateResource(APIServiceResource.ResourceType.articles, this.card.id, {} );
+                    //this.card.likeList.forEach((i) => {console.log('dds',i, this.card.likeList, this.cards)})
+                    this.card = await res.json();
+                    console.log(this.card);
+                    this.userMark = !this.userMark;
+                    
             },
+
             async addComment() {
                 this.card.comments.push({text:this.quote})
                 this.quote = ''
@@ -227,10 +228,10 @@
                 window.document.body.classList.add("modal-active")
             },
             openMore(id) {
-                console.log(id);
                 this.card = this.cards.find(item => item.id === id)
                 this.$refs.openBookModal.show = true
                 this.isOpen = !this.isOpen
+                this.isUserLikedArticle();
                 window.document.body.classList.add("modal-active")
             },
             async onSubmit() {
@@ -276,6 +277,24 @@
             border: 1px solid #5a8664;
             color: #4c7255;
         }
+    }
+    .star {
+            color: #dcdcdc;
+            cursor: pointer;
+            font-size: 3.5rem;
+            transition: .2s;
+        }
+
+    .star:hover, .star:hover ~ .star {
+        color: #989898;
+    }
+    .liked.star {
+        color: #272727;
+    }
+    .mark__my{
+        display: flex;
+        margin: 20px 0;
+        align-items: center;
     }
     .article__body {
         text-align: left;

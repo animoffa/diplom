@@ -5,7 +5,10 @@
             <p class="subtitle">{{card.author.name}} {{card.author.lastname}}</p>
             <p class="preview" v-html="card.text"></p>
             <div class="actions">
+                <div class="card__likes">
                 <Stars :mark="card.mark"/>
+                <span class="card__like-count">{{card.likeList.length}}</span>
+                </div>
                 <!-- <div class="more-img-container">
                     <img src="../assets/img/more.svg" alt="actions"/>
                 </div> -->
@@ -107,6 +110,16 @@
             -webkit-line-clamp: 4;
             -webkit-box-orient: vertical;  
             overflow: hidden;
+        }
+        .card__likes{
+            display: flex;
+            align-items: center;
+        }
+
+        .card__like-count{
+            font-size: 15px;
+            margin-top: 3px;
+            margin-left: 10px;
         }
 
         .score {
