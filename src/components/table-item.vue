@@ -4,7 +4,7 @@
             {{card.title}}
         </div>
         <div class="author">
-            {{card.author}}
+            ★ {{card.likeList.length}}
         </div>
         <div class="delete-button" v-on:click="deleteBook" >
             <div> ╳</div>
@@ -17,11 +17,6 @@
 <script>
 
     export default {
-        data() {
-            return {
-
-            }
-        },
         props: ["card"],
         methods: {
             deleteBook() {
@@ -32,7 +27,6 @@
                 this.$emit('open-more', this.card._id);
             }
         },
-
     }
 </script>
 <style lang="less">

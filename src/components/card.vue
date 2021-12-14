@@ -9,9 +9,6 @@
                 <Stars :mark="card.mark"/>
                 <span class="card__like-count">{{card.likeList.length}}</span>
                 </div>
-                <!-- <div class="more-img-container">
-                    <img src="../assets/img/more.svg" alt="actions"/>
-                </div> -->
                 <div class="actions__date">
                     <div class="more-img-container">
                     <img src="../assets/img/gray-time.svg" alt="actions"/>
@@ -19,14 +16,6 @@
                 <p>{{convertDate(card.date)}}</p>
                 </div>
             </div>
-            <!-- <div class="quotes">
-                <ul>
-                    <li>{{(card.comments && card.comments[0])?firstLetterToUppercase(card.comments[0].text):"Пока нет комментариев"}}</li>
-                </ul>
-            </div> -->
-            <!-- <div v-on:click="isDeleteClicked=!isDeleteClicked" class="delete-button">
-                ╳
-            </div> -->
         </div>
         <div class="back">
             <h2>Удалить?</h2>

@@ -25,35 +25,35 @@
 </template>
 <script>
     import AuthAPI from "@/services/APIServiceAuth.js"
-    
+    import {mapState} from 'vuex';
 
     export default {
         name: 'profile-component',
         data() {
             return {
                 showEdit: "false",
-                content: {}
+                isFriendPage: false,
+                friendId: 0,
             }
         },
-        asyncData() {
-
-        },
-        async mounted() {
-            if (!localStorage.getItem("token")) {
-                this.redirectToLogin();
-                return;
+        mounted() {
+            if (this.$route.query.tab.includes('user')) {
+                this.isFriendPage = true;
+                this.friendId = this.$route.query.tab.slice(4);
+            } else {
+                this.isFriendPage = false;
             }
-            this.fetchAccountInfo();
-
+        },
+        computed: {
+            ...mapState('client', ['user', 'allUsers']),
+            content() {
+                if (this.isFriendPage) {
+                    return this.allUsers.find(user => user.id === this.friendId)
+                }
+                return this.user;
+            }
         },
         methods: {
-            async fetchAccountInfo() {
-                this.isLoading = true;
-                const responseAuth = await AuthAPI.getAuth();
-                this.content = await responseAuth.json();
-                console.log('s',this.content);
-                this.isLoading = false;
-            },
             async saveChanges() {
                 this.isLoading = true;
                 const responseAuth = await AuthAPI.editUser(this.content);

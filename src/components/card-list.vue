@@ -163,8 +163,8 @@
             isUserLikedArticle() {
                 let exist = {};
                 exist = this.card.likeList.find((i)=>{return i.id === this.user.id});
-                this.userMark = Object.keys(exist).length === 0 ? false : true;
-                console.log(this.userMark);
+                this.userMark = exist === undefined ? false : Object.keys(exist).length === 0 ? false : true;
+                console.log(this.userMark, exist );
             },
             showMore() {
                 this.page += 1;
@@ -205,9 +205,8 @@
                     const res = await API.updateResource(APIServiceResource.ResourceType.articles, this.card.id, {} );
                     //this.card.likeList.forEach((i) => {console.log('dds',i, this.card.likeList, this.cards)})
                     this.card = await res.json();
-                    console.log(this.card);
                     this.userMark = !this.userMark;
-                    
+                    this.$emit('fetch-cards');
             },
 
             async addComment() {
@@ -281,6 +280,7 @@
     .star {
             color: #dcdcdc;
             cursor: pointer;
+            margin-left: 10px;
             font-size: 3.5rem;
             transition: .2s;
         }

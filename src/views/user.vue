@@ -10,8 +10,7 @@
                 </div>
             <ul class="menu__nav">
                 <li><a href="/">Популярные статьи</a></li>
-                <li><a href="/">Новые</a></li>
-                <!-- <li><a href="/">Статьи друзей</a></li> -->
+                <li><a href="/">Статьи компании</a></li>
             </ul>
             <div class="actions">
                 <div class="user">
@@ -28,8 +27,9 @@
             <div class="user-content">
                 <div class="sidebar">
                     <ul>
-                        <li v-for="item of sidebarList" :class="{'active': item.query===activeTab}" :key="item.name" @click="changeTab(item.query)">
+                        <li v-for="(item,i) of sidebarList" :key="'sidebar'+i" :class="{'active': item.query===activeTab}"  @click="changeTab(item.query)" class="sidebar__item">
                             {{item.name}}
+                            <div v-if="item.isDeletable" class="sidebar__delete-btn" @click="deleteSidebarItem(i)">╳</div>
                         </li>
                     </ul>
 
@@ -38,6 +38,7 @@
                     <component
                         :is="bigTabItemsFactory(this.activeTab)"
                         :key="`${this.activeTab}-block`"
+                        @open-friend-page="openColleguePage"
                         />
                 </div>
             </div>
@@ -48,13 +49,15 @@
 <script>
     import ProfileComponent from '@/components/ProfileComponent';
     import EditArticles from '@/components/EditArticles';
+    import FriendsComponent from '@/components/FriendsComponent';
 
     export default {
         data() {
             return {
-                sidebarList:[{name:'Профиль', query:'profile'}, {name:'Редактирование статей', query:'myArticles'}],
+                sidebarList:[{name:'Профиль', query:'profile'}, {name:'Редактирование статей', query:'myArticles'}, {name: 'Коллеги', query: 'colleagues'}],
                 isLoading: false,
                 activeTab: 'profile',
+
             }
         },
 
@@ -62,15 +65,30 @@
             if (this.$route.query.tab) {
                 this.activeTab = this.$route.query.tab;
             }
-            // if (!localStorage.getItem("token")) {
-            //     this.redirectToLogin();
-            //     return;
-            // }
-            // this.fetchResource();
-            // this.fetchAccountInfo();
+            if (!localStorage.getItem("token")) {
+                this.redirectToLogin();
+                return;
+            }
+        },
+        created() {
+            this.$store.dispatch('client/getAllUsers');
+            this.$store.dispatch('client/getUser');
+            this.$store.dispatch('articles/getArticles');
+        },
+        computed: {
 
         },
+
         methods: {
+            openColleguePage(user) {
+                console.log('434343');
+                this.sidebarList.push({name:`${user.name} ${user.lastname}`, query:`user${user.id}`, isDeletable: true})
+                this.changeTab(`user${user.id}`);
+            },
+            deleteSidebarItem(id) {
+                this.changeTab('profile');
+                this.sidebarList.splice(id,1);
+            },
             exit() {
                 localStorage.removeItem("token");
             },
@@ -82,10 +100,10 @@
                 switch(item) {
                     case 'profile':
                         return ProfileComponent;
-                    // case 'friends':
-                    //     return FriendsComponent;
                     case 'myArticles':
                         return EditArticles;
+                    case 'colleagues':
+                            return FriendsComponent;
                     default:
                         return ProfileComponent;
                 }
@@ -100,6 +118,14 @@
     .user-template{
         width:94%;
         margin: 0 auto;
+    }
+    .sidebar__item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .sidebar__delete-btn {
+        font-size: 10px;
     }
     .menu__nav{
         display: flex;

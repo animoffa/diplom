@@ -135,7 +135,7 @@
         .main-select{
              background:transparent;
              font-size: 2.2rem;
-             width:27rem;
+             width:23rem;
              margin-left: 1rem;
 
              option {
@@ -148,7 +148,7 @@
         .select-arrow {
             position: relative;
             left: -3rem;
-            top: -0.2rem;
+            top: 0.1rem;
             z-index: 1;
             width: 1.5rem;
 
