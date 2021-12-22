@@ -6,7 +6,7 @@
             <p class="preview" v-html="card.text"></p>
             <div class="actions">
                 <div class="card__likes">
-                <Stars :mark="card.mark"/>
+                <div class="star" :class="{'liked':isUserLikedArticle()}">★</div>
                 <span class="card__like-count">{{card.likeList.length}}</span>
                 </div>
                 <div class="actions__date">
@@ -28,23 +28,26 @@
 </template>
 
 <script>
-    import Stars from "@/components/stars"
 
     export default {
         data() {
             return {
                 isDeleteClicked: false,
+                userMark: false,
             }
         },
-        components: {
-            Stars
-        },
-        props: ["card"],
+
+        props: ["card", 'user'],
 
         methods: {
             deleteBook() {
                 this.isDeleteClicked = !this.isDeleteClicked
                 this.$emit('delete-card', this.card.id);
+            },
+            isUserLikedArticle() {
+               let exist = {};
+                exist = this.card.likeList.find((i)=>{return i.id === this.user.id});
+                return exist === undefined ? false : Object.keys(exist).length === 0 ? false : true;
             },
             openMore() {
                 this.$emit('open-more', this.card.id);
@@ -80,6 +83,18 @@
         border-radius: 1rem;
         align-items: flex-start;
         padding: 4.5rem 3rem 4rem;
+
+        .star {
+            color: #dcdcdc;
+            cursor: pointer;
+            margin-left: 10px;
+            font-size: 3.5rem;
+            transition: .2s;
+        }
+
+        .liked.star {
+            color: #272727;
+        }
 
         .actions__date {
             display: flex;

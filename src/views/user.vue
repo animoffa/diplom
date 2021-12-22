@@ -9,7 +9,7 @@
                     <a href="/"><h1>quickDoc</h1></a>
                 </div>
             <ul class="menu__nav">
-                <li><a href="/">Популярные статьи</a></li>
+                <li><a href="/">Статьи</a></li>
                 <li><a href="/">Статьи компании</a></li>
             </ul>
             <div class="actions">

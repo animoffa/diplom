@@ -203,7 +203,7 @@
 
             p {
                 color: #a6b2c8d8;
-                font-size: 1.5rem;
+                font-size: 1.4rem;
             }
         }
         .open-book__content{

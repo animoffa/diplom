@@ -1,9 +1,9 @@
 <template>
-    <div v-bind:class="{modalBack:isOpen}">
+    <div :class="{modalBack:isOpen}">
         <div class="books-container">
-            <Card v-for="(card,i) in cards" v-bind:key="i" v-bind:card="card"
+            <Card v-for="(card,i) in cards" :key="i" :card="card"
                   v-scroll="onPageDown" v-on:scroll="onPageDown"
-                  @open-more="openMore" class="card-container"/>
+                  @open-more="openMore" class="card-container" :user="user"/>
         </div>
         <!-- <div class="more-cards" id="more" @click="showMore">Показать ещё</div> -->
         <div class="add-card" id="show-modal" @click="showModal">+</div>
@@ -18,7 +18,7 @@
                         <input class="modal_input" placeholder="Название" v-model.trim="title"/>
                         
 
-                        <ul v-for="(item,i) of quotes" v-bind:key="i" v-bind:quote="item">
+                        <ul v-for="(item,i) of quotes" :key="i" :quote="item">
                             <li>{{item}}</li>
                         </ul>
 
@@ -47,7 +47,7 @@
                         <div class="mark-container">
                             <div class="mark__my">
                                 <span>Оцените статью: </span>
-                                <!-- <Stars v-bind:mark="userMark" @change-mark="changeMark"/> -->
+                                <!-- <Stars :mark="userMark" @change-mark="changeMark"/> -->
                                 <div class="star" :class="{'liked':userMark}" @click="changeMark">★</div>
                             </div>
                             <div class="mark__our">
@@ -62,22 +62,21 @@
                             </div>
                         </form>
                         <ul>
-                            <li class="open-book__li" v-for="(item,i) of card.comments" v-bind:key="i"
-                                v-bind:quote="item">
+                            <li class="open-book__li" v-for="(item,i) of card.commentList" :key="i"
+                            >
                                 <div class="open-book__img"> 
                                     <img src="../assets/img/user.png"/>
                                 </div>
                                 <div class="open-book__content">
-                                <p class="open-book__author">{{item.author && item.author.name}} {{item.author && item.author.lastName}}</p>
-                                <span>{{item.text}}</span>
+                                <p class="open-book__author">{{item.author && item.author.name}} {{item.author && item.author.lastname}}</p>
+                                <span>{{item.text.substr(1).slice(0, -1) }}</span>
                                 <div class="open-book__buttons">
-                                    <div class="mark-comment" @click="setLikeOnComment(item)">👍<div>{{item.likes || 0}}</div></div>
-                                    <div class="mark-comment dislike" @click="setDislikeOnComment(item)">👎<div>{{item.dislikes || 0}}</div></div>
+                                    
                                     <div class="open-book__date">
                                         <div class="more-img-container">
                                             <img src="../assets/img/gray-time.svg"/>
                                         </div>
-                                        <p>{{card.date}}</p>
+                                        <p>{{formatDate(card.date)}}</p>
                                     </div>
                                 </div>
                                 </div>
@@ -160,11 +159,16 @@
             this.onPageDown();
         },
         methods: {
+            formatDate(date) {
+                const newDate = new Date(date);
+                console.log(newDate, Date.parse(date));
+
+                return `${newDate.getDate()}.${newDate.getMonth() + 1 > 9 ? newDate.getMonth() + 1 : '0' + (newDate.getMonth() + 1)}.${newDate.getFullYear()}`;
+            },
             isUserLikedArticle() {
                 let exist = {};
                 exist = this.card.likeList.find((i)=>{return i.id === this.user.id});
                 this.userMark = exist === undefined ? false : Object.keys(exist).length === 0 ? false : true;
-                console.log(this.userMark, exist );
             },
             showMore() {
                 this.page += 1;
@@ -202,23 +206,18 @@
             // },
 
             async changeMark() {
-                    const res = await API.updateResource(APIServiceResource.ResourceType.articles, this.card.id, {} );
-                    //this.card.likeList.forEach((i) => {console.log('dds',i, this.card.likeList, this.cards)})
+                    const res = await API.updateResourceID(APIServiceResource.ResourceType.articles, this.card.id, {} );
                     this.card = await res.json();
                     this.userMark = !this.userMark;
                     this.$emit('fetch-cards');
             },
 
             async addComment() {
-                this.card.comments.push({text:this.quote})
-                this.quote = ''
-                // try {
-                //     const res = await API.updateResource(APIServiceResource.ResourceType.books, this.card._id, this.card)
-                //     await this.cards.splice(index, 1, res.json())
-
-                // } catch (e) {
-                //     console.error("Error while fetching: " + e.toString());
-                // }
+                const res = await API.updateResourceID(APIServiceResource.ResourceType.comment, this.card.id, this.quote  );
+                    this.card = await res.json();
+                    console.log(this.card);
+                    this.quote = ''
+                    this.$emit('fetch-cards');
             },
 
             showModal() {
@@ -244,8 +243,8 @@
                     }
 
                     try {
-                        const res = await API.createResource(APIServiceResource.ResourceType.articles, newCard)
-                        await this.cards.push(await res.json())
+                        await API.createResource(APIServiceResource.ResourceType.articles, newCard)
+                        this.$emit('fetch-cards');
                     } catch (e) {
                         console.error("Error while fetching: " + e.toString());
                     }
@@ -287,6 +286,10 @@
 
     .star:hover, .star:hover ~ .star {
         color: #989898;
+    }
+    .more-img-container {
+        margin-bottom: 3px;
+        margin-right: 5px;
     }
     .liked.star {
         color: #272727;

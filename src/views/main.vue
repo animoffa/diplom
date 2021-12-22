@@ -4,17 +4,14 @@
            <Preloader/>
         </template> -->
         <template >
-        <!-- <div class="mapping-buttons">
-            <button v-on:click="isCardMapping=true" v-bind:class="{activeButton:isCardMapping}">Cards</button>
-            <button v-on:click="isCardMapping=false" v-bind:class="{activeButton:!isCardMapping}">Table</button>
-        </div> -->
+       
         <div class="menu">
           <div class="title">
             <a href="/"><h1>quickDoc</h1></a>
           </div>
           <ul class="menu__nav">
                 <li><a href="/user?tab=profile">Мой профиль</a></li>
-                <!-- <li><a href="/user?tab=friends">Друзья</a></li> -->
+                <li><a href="/user?tab=colleagues">Коллеги</a></li>
                 <li><a href="/user?tab=myArticles">Редактирование статей</a></li>
             </ul>
           <div class="actions">

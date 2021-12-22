@@ -29,6 +29,10 @@ export class APIServiceResource {
         this.isResourceExists(resourceName);
         return this.fetch(APIServiceResource.MethodType.PUT(newValues), APIServiceResource.ResourceType[resourceName]);
     }
+    updateResourceID(resourceName, id, newValues) {
+        this.isResourceExists(resourceName);
+        return this.fetch(APIServiceResource.MethodType.PUT(newValues), APIServiceResource.ResourceType[resourceName], id);
+    }
 
     deleteResource(resourceName, id) {
         this.isResourceExists(resourceName);
@@ -54,7 +58,7 @@ export class APIServiceResource {
         DELETE: () => ({method: 'DELETE', headers: APIServiceResource.MethodType.getHeaders()}),
     };
 
-    static ResourceType = {articles: 'articles', users: 'users'};
+    static ResourceType = {articles: 'articles', users: 'users', comment: 'comment'};
 }
 
 export default new APIServiceResource('http://localhost:8080');

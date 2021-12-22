@@ -3,6 +3,7 @@
         <div class="profile__main">
             <div class="profile__photo">
                 <img src="../assets/img/userBig.png"/>
+                <input id="file-input" type="file" name="name"  />
             </div>
             <div class="profile__main-info">
                 <div class="field"><strong v-show="showEdit">{{content.name}}</strong><input v-show="!showEdit" v-model="content.name"/></div>
