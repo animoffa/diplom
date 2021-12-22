@@ -19,7 +19,6 @@
         props: ["mark"],
         methods: {
             setNewMark(newMark) {
-                console.log('sds');
                 this.$emit('change-mark', newMark);
             }
         },

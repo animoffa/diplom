@@ -77,7 +77,6 @@ export default  ({
         'articles' 
       ]),
       cards() {
-        console.log(this.articles);
         return this.articles.filter(card => card.author.id === this.user.id);
       },
         displayedPosts() {
@@ -104,7 +103,6 @@ export default  ({
             },
          async deleteCard(id) {
                 this.cards = this.cards.filter(book => {
-                    console.log(id,book.id);
                    return book.id !== id});
 
                 // try {
@@ -148,10 +146,12 @@ export default  ({
     }
     &.no-height {
         height:auto;
+
     }
 }
 .no-articles {
     font-size: 17px;
+    color: #a2a2a2;
 }
 .books-container-table {
         display: flex;

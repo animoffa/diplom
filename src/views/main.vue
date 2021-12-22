@@ -17,7 +17,7 @@
           <div class="actions">
             <div class="user">
                 <div class="img">
-                    <router-link to="/user" v-on:click="exit"><img src="../assets/img/user.png"/></router-link>
+                    <router-link to="/user" v-on:click="exit"><img class="main__img-user" :src="user && user.img ? user.img :'../assets/img/user.png'"/></router-link>
                 </div>
                 <p class="des un">{{user ? user.name : 'войдите'}}</p>
             </div>
@@ -116,7 +116,6 @@
             cardGroup() {
               if (this.sortList === 'company') {
                 const newCards = this.sortedList.filter(item => this.user.company === item.author.company);
-                console.log(newCards);
                 return newCards;
               }
               return this.sortedList;
@@ -153,6 +152,12 @@
 </script>
 
 <style lang="less">
+    .main__img-user {
+        width: 25px;
+        height: 25px;
+        object-fit: cover;
+        border-radius: 50%;
+    }
     .user {
         font-size: 1.8rem;
         margin-right: 1rem;

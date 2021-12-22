@@ -2,8 +2,9 @@
     <div class="profile">
         <div class="profile__main">
             <div class="profile__photo">
-                <img src="../assets/img/userBig.png"/>
-                <input id="file-input" type="file" name="name"  />
+                <!-- ../assets/img/userBig.png -->
+                <img :src="content.img"/>
+                <input v-if="!showEdit" id="file-input" type="file" name="name" accept="image/png, image/jpg, image/jpeg"  @change="uploadImage"/>
             </div>
             <div class="profile__main-info">
                 <div class="field"><strong v-show="showEdit">{{content.name}}</strong><input v-show="!showEdit" v-model="content.name"/></div>
@@ -21,7 +22,7 @@
             
         </div>
         <button class="profile-button modal-button" @click="saveChanges" v-show="!showEdit">Сохранить</button>
-        <div class="edit-button" @click="showEdit=!showEdit"/>
+        <div class="edit-button" v-if="!isFriendPage" @click="showEdit=!showEdit"/>
     </div>
 </template>
 <script>
@@ -33,6 +34,7 @@
         data() {
             return {
                 showEdit: "false",
+                image_file: null,
                 isFriendPage: false,
                 friendId: 0,
             }
@@ -59,10 +61,24 @@
         methods: {
             async saveChanges() {
                 this.isLoading = true;
-                const responseAuth = await AuthAPI.editUser(this.content);
-                console.log('sw', responseAuth);
+                await AuthAPI.editUser(this.content);
                 this.isLoading = false;
-            }
+            },
+            uploadImage(event) {
+                this.image_file = event.target.files[0];
+                var reader = new FileReader();
+                let src = '';
+                reader.onloadend = function() {
+                    src = reader.result;
+                    console.log('RESULT', reader.result);
+                }
+                reader.readAsDataURL(this.image_file);
+                setTimeout(()=>{
+                    this.$set(this.content, 'img', src);
+                    console.log(src, this.content, 'uu')
+                },200)
+               
+            },
         }
        
     }
@@ -168,6 +184,8 @@
             img {
                 width: 100%;
                 height: 100%;
+                border-radius: 20px;
+                object-fit: cover;
             }
         }
         &__full-info{

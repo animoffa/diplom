@@ -1,5 +1,6 @@
 <template>
     <div class="friends" :class="{modalBack:isOpen}">
+        <template v-if="colleagues && colleagues.length > 0">
            <FriendItem 
               v-for="user of colleagues" 
               :key="'collegues'+user.id" 
@@ -7,6 +8,8 @@
               :countOfArticles="countOfArticles(user.id)"
               @open-friend-page="openFriendPage"
               />
+        </template>
+        <template v-else><p class="friends__no">Коллег не найдено</p></template>
     </div>
 </template>
 <script>
@@ -63,6 +66,12 @@ export default  ({
         margin-right: 20px;
         height: auto;
         margin-bottom: 20px;
+    }
+
+    &__no {
+        margin: 0 auto;
+        font-size: 17px;
+        color: #a2a2a2;
     }
 }
 .edit{

@@ -161,8 +161,6 @@
         methods: {
             formatDate(date) {
                 const newDate = new Date(date);
-                console.log(newDate, Date.parse(date));
-
                 return `${newDate.getDate()}.${newDate.getMonth() + 1 > 9 ? newDate.getMonth() + 1 : '0' + (newDate.getMonth() + 1)}.${newDate.getFullYear()}`;
             },
             isUserLikedArticle() {
@@ -215,7 +213,6 @@
             async addComment() {
                 const res = await API.updateResourceID(APIServiceResource.ResourceType.comment, this.card.id, this.quote  );
                     this.card = await res.json();
-                    console.log(this.card);
                     this.quote = ''
                     this.$emit('fetch-cards');
             },

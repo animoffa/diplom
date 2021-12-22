@@ -37,7 +37,6 @@
             async onSubmit() {  
                 if (this.login && this.password && this.password.length > 3) {
                     try {
-                        console.log("sefs");
                         const res = await API.login({email: this.login, password: this.password});
                         const json = await res.json();
                         await localStorage.setItem("token", json.jwt);

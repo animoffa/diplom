@@ -1,9 +1,9 @@
 <template>
     <div class="user-template">
-        <!-- <template  v-if="isLoading">
+        <template  v-if="isLoading">
            <Preloader/>
-        </template> -->
-        <template>
+        </template>
+        <template v-else>
             <div class="menu">
                 <div class="title">
                     <a href="/"><h1>quickDoc</h1></a>
@@ -15,9 +15,9 @@
             <div class="actions">
                 <div class="user">
                 <div class="img">
-                    <router-link to="/user" v-on:click="exit"><img src="../assets/img/user.png"/></router-link>
+                    <router-link to="/user" v-on:click="exit"><img class="main__img-user" :src="user && user.img ? user.img :'../assets/img/user.png'"/></router-link>
                 </div>
-                <p class="des un">имя</p>
+                <p class="des un">{{user ? user.name : 'войдите'}}</p>
             </div>
                 <router-link class="route exit" to="/login" v-on:click="exit"><img src="../assets/img/exit.png" class="exit-ico"/>
                 </router-link>
@@ -50,6 +50,8 @@
     import ProfileComponent from '@/components/ProfileComponent';
     import EditArticles from '@/components/EditArticles';
     import FriendsComponent from '@/components/FriendsComponent';
+    import Preloader from '@/components/preloader';
+    import { mapState } from 'vuex';
 
     export default {
         data() {
@@ -59,6 +61,9 @@
                 activeTab: 'profile',
 
             }
+        },
+        components: {
+            Preloader
         },
 
         async mounted() {
@@ -76,12 +81,11 @@
             this.$store.dispatch('articles/getArticles');
         },
         computed: {
-
+            ...mapState('client', ['user']),  
         },
 
         methods: {
             openColleguePage(user) {
-                console.log('434343');
                 this.sidebarList.push({name:`${user.name} ${user.lastname}`, query:`user${user.id}`, isDeletable: true})
                 this.changeTab(`user${user.id}`);
             },
