@@ -154,7 +154,7 @@
         flex-direction: column;
         border-radius: 1rem;
         align-items: flex-start;
-        padding: 6rem 7rem 6rem;
+        padding: 6rem 5rem 6rem;
     }
     .sidebar{
         width:22%;

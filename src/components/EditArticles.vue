@@ -1,6 +1,7 @@
 <template>
-    <div class="edit" :class="{modalBack:isOpen}">
+    <div class="edit" :class="{modalBack:isOpen, 'no-height':!(displayedPosts && displayedPosts.length > 0)}">
     <div class="books-container-table">
+        <template v-if="displayedPosts && displayedPosts.length > 0">
             <tableItem v-for="(card,i) in displayedPosts" v-bind:key="i" v-bind:card="card"
                        @delete-card="deleteCard" @open-more="openMore(card.id)"></tableItem>
             <nav class="pagination">
@@ -22,6 +23,10 @@
                     </li>
                 </ul>
             </nav>
+        </template>
+        <template v-else>
+            <p class="no-articles">У вас пока нет статей</p>
+        </template>
         </div>
         <modal-window ref="addBookModal">
             <template v-slot:title>
@@ -141,6 +146,12 @@ export default  ({
     .pagination{
         margin-top:3rem;
     }
+    &.no-height {
+        height:auto;
+    }
+}
+.no-articles {
+    font-size: 17px;
 }
 .books-container-table {
         display: flex;

@@ -47,8 +47,10 @@
         computed: {
             ...mapState('client', ['user', 'allUsers']),
             content() {
+                console.log(this.isFriendPage, 'this.isFriendPage')
                 if (this.isFriendPage) {
-                    return this.allUsers.find(user => user.id === this.friendId)
+                    console.log(this.allUsers.find(user => console.log(user.id,+this.friendId )), 'this.allUsers.find(user => user.id === this.friendId)')
+                    return this.allUsers.find(user => user.id === +this.friendId)
                 }
                 return this.user;
             }

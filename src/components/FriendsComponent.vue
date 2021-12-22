@@ -1,6 +1,5 @@
 <template>
     <div class="friends" :class="{modalBack:isOpen}">
-    <div class="books-container-table">
            <FriendItem 
               v-for="user of colleagues" 
               :key="'collegues'+user.id" 
@@ -8,7 +7,6 @@
               :countOfArticles="countOfArticles(user.id)"
               @open-friend-page="openFriendPage"
               />
-    </div>
     </div>
 </template>
 <script>
@@ -55,6 +53,18 @@ export default  ({
 })
 </script>
 <style lang="less">
+.friends {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    .friend {
+        width: 30%;
+        margin-right: 20px;
+        height: auto;
+        margin-bottom: 20px;
+    }
+}
 .edit{
     width:100%;
     height:64rem;
