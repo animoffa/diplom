@@ -232,6 +232,8 @@
             async onSubmit() {
                 if (this.title.trim()) {
                     const now = new Date();
+                    
+                 
                     const newCard = {
                         title: this.title,  
                         text: this.quote,

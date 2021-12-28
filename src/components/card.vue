@@ -56,7 +56,7 @@
                 return str[0].toUpperCase() + str.slice(1)
             },
             convertDate(date) {
-                const formattedDate = new Date(date);
+                const formattedDate = new Date(date * 1000)
                 const month = (formattedDate.getMonth()+1) < 10 ? '0'+(formattedDate.getMonth()+1) : formattedDate.getMonth();
                 const day= formattedDate.getDate() < 10 ? '0'+formattedDate.getDate() : formattedDate.getDate();
                 return `${day}.${month}.${formattedDate.getFullYear()}`;

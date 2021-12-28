@@ -15,7 +15,10 @@
             <div class="actions">
                 <div class="user">
                 <div class="img">
-                    <router-link to="/user" v-on:click="exit"><img class="main__img-user" :src="user && user.img ? user.img :'../assets/img/user.png'"/></router-link>
+                    <router-link to="/user" v-on:click="exit">
+                    <img class="main__img-user" v-if="user && user.img" :src="user.img"/>
+                    <img v-else class="main__img-user" src="../assets/img/user.png"/>
+                    </router-link>
                 </div>
                 <p class="des un">{{user ? user.name : 'войдите'}}</p>
             </div>
@@ -184,6 +187,10 @@
             text-align: left;
             width: 100%;
             border-radius: 1rem;
+
+            &:hover {
+                background-color:#47725118;
+            }
         }
         .active {
             background-color:#4772513b;

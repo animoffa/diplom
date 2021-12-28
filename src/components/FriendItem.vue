@@ -1,7 +1,8 @@
 <template>
     <div class="friend" @click="openFriendPage(user)">
         <div class="friend__photo">
-                <img src="../assets/img/user.png"/>
+                <img v-if="user && user.img" :src="user.img"/>
+                <img v-else class="default" src="../assets/img/userBig.png"/>
         </div>
         <div class="friend__name title">
             {{user.name}} {{user.lastname}}
@@ -49,7 +50,7 @@
         flex-direction: column;
         border-radius: 1rem;
         align-items: flex-start;
-        padding: 4.5rem 2.5rem 3rem;
+        padding: 3.5rem 4rem 2.6rem;
 
         &__photo {
             width:100%;
@@ -57,7 +58,16 @@
             margin-bottom: 20px;
 
             img {
-                width: 50%;
+                width: 100%;
+                min-height: 165px;
+                border-radius: 6px;
+                object-fit: cover;
+                &.default {
+                    min-height: none;
+                    height: auto;
+                    object-fit: contain;
+                    width: 60%;
+                }
             }
         }
 

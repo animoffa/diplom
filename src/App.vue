@@ -1,7 +1,7 @@
 <template>
     <div id="app">
         <div class="img-container-bg">
-            <img src="../src/assets/img/bg.png" alt="background, just background"/>
+            <img src="../src/assets/img/bg2.jpg" alt="background, just background"/>
         </div>
         <router-view/>
     </div>
@@ -20,7 +20,6 @@
         flex-direction: column;
         align-items: center;
         padding-top: 1rem;
-
     }
     .exit-ico{
 
@@ -351,12 +350,18 @@
 
     .img-container-bg {
         position: fixed;
-        width: 25%;
+        width: 100%;
+        height:100%;
+        z-index: -1;
+        opacity: 0.1;
         right: 0;
         bottom: 0;
+        background-image: url(../src/assets/img/bg2.jpg);
+        background-size: 20%;
 
         img {
-            width: 100%;
+            width: 30%;
+            opacity: 0;
         }
     }
 

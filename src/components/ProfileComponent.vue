@@ -3,13 +3,15 @@
         <div class="profile__main">
             <div class="profile__photo">
                 <!-- ../assets/img/userBig.png -->
-                <img :src="content.img"/>
-                <input v-if="!showEdit" id="file-input" type="file" name="name" accept="image/png, image/jpg, image/jpeg"  @change="uploadImage"/>
+                <img v-if="content.img" :src="content.img"/>
+                <img v-else src="../assets/img/userBig.png"/>
+                <button class="profile-button modal-button img-btn" @click="$refs.upload.click()" v-show="!showEdit">Изменить фото</button>
+                <input v-if="!showEdit" id="file-input" type="file" style="display:none" name="name" accept="image/png, image/jpg, image/jpeg" ref="upload"  @change="uploadImage"/>
             </div>
             <div class="profile__main-info">
                 <div class="field"><strong v-show="showEdit">{{content.name}}</strong><input v-show="!showEdit" v-model="content.name"/></div>
                 <div class="field"><strong v-show="showEdit">{{content.lastname}}</strong><input v-show="!showEdit" v-model="content.lastname"/></div>
-                <p>Дата рождения: <span v-show="showEdit">{{content.birthDate}}</span><input v-show="!showEdit" v-model="content.birthDate"/></p>
+                <p>Дата рождения: <span v-show="showEdit">{{birthday ? birthday : convertDate(content.birthday)}}</span><input v-show="!showEdit" :value="birthday" @input="birthday = $event.target.value; content.birthday = $event.target.value"/></p>
                 <p>Компания: <span v-show="showEdit">{{content.company}}</span><input v-show="!showEdit" v-model="content.company"/></p>
             </div>
             </div>
@@ -17,7 +19,7 @@
                 <p>E-mail: <a v-show="showEdit" :href="'mailto:'+content.email">{{content.email}}</a><input v-show="!showEdit" v-model="content.email"/></p>
                 <p>Телефон: <a v-show="showEdit" :href="'tel:'+content.phone">{{content.phone}}</a><input v-show="!showEdit" v-model="content.phone"/></p>
                 <p>Адрес: <span v-show="showEdit">{{content.address}}</span><input v-show="!showEdit" v-model="content.address"/></p>
-                <p>Количество статей: <span v-show="showEdit">{{content.countOfArticle}}</span><input v-show="!showEdit" v-model="content.countOfArticle"/></p>
+                <p>Количество статей: <span v-show="showEdit">{{countOfArticle}}</span><input v-show="!showEdit" disabled="disabled"/></p>
                 <p>О себе: <span v-show="showEdit">{{content.about}}</span><textarea v-show="!showEdit" v-model="content.about"/></p>
             
         </div>
@@ -36,19 +38,26 @@
                 showEdit: "false",
                 image_file: null,
                 isFriendPage: false,
-                friendId: 0,
+                friendId: 0, 
+                birthday: ''
             }
         },
         mounted() {
+
+            if (this.$route.query.tab) {
             if (this.$route.query.tab.includes('user')) {
                 this.isFriendPage = true;
                 this.friendId = this.$route.query.tab.slice(4);
             } else {
                 this.isFriendPage = false;
             }
+            }
         },
         computed: {
             ...mapState('client', ['user', 'allUsers']),
+            ...mapState('articles', [
+            'articles' 
+            ]),
             content() {
                 console.log(this.isFriendPage, 'this.isFriendPage')
                 if (this.isFriendPage) {
@@ -56,11 +65,21 @@
                     return this.allUsers.find(user => user.id === +this.friendId)
                 }
                 return this.user;
+            },
+            countOfArticle() {
+                return this.articles.filter(article => article.author.id === this.content.id).length
             }
         },
         methods: {
             async saveChanges() {
                 this.isLoading = true;
+
+                const date = this.content.birthday.split('.');
+                console.log(date);
+                const dateForServ = new Date(date[2], date[1], date[0]);
+                this.content.birthday = dateForServ.toISOString();
+                console.log(this.content.birthday);
+
                 await AuthAPI.editUser(this.content);
                 this.isLoading = false;
             },
@@ -70,15 +89,19 @@
                 let src = '';
                 reader.onloadend = function() {
                     src = reader.result;
-                    console.log('RESULT', reader.result);
                 }
                 reader.readAsDataURL(this.image_file);
                 setTimeout(()=>{
                     this.$set(this.content, 'img', src);
-                    console.log(src, this.content, 'uu')
                 },200)
                
             },
+            convertDate(date) {
+                const formattedDate = new Date(date * 1000)
+                const month = (formattedDate.getMonth()+1) < 10 ? '0'+(formattedDate.getMonth()+1) : formattedDate.getMonth();
+                const day= formattedDate.getDate() < 10 ? '0'+formattedDate.getDate() : formattedDate.getDate();
+                return `${day}.${month}.${formattedDate.getFullYear()}`;
+            }
         }
        
     }
@@ -152,6 +175,21 @@
             height: 10rem;
               
         }
+        .img-btn {
+            position:absolute;
+            bottom:0%;
+            width: 100%;
+            left: 50%;
+            transform:translate(-50%, 0%);
+            opacity: 0.5;
+            margin-top: 0;
+            transition: 0.3s;
+            border-radius: 0;
+
+            &:hover {
+                opacity: 0.8;
+            }
+        }
         span{
             width:70%;
             font-size: 1.9rem;
@@ -181,6 +219,9 @@
         &__photo{
             width:200px;
             height:200px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
             img {
                 width: 100%;
                 height: 100%;

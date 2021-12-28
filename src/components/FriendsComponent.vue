@@ -62,7 +62,7 @@ export default  ({
     flex-wrap: wrap;
     justify-content: flex-start;
     .friend {
-        width: 30%;
+        width: 29%;
         margin-right: 20px;
         height: auto;
         margin-bottom: 20px;
