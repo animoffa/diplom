@@ -62,15 +62,15 @@ export default  ({
     flex-wrap: wrap;
     justify-content: flex-start;
     .friend {
-        width: 29%;
-        margin-right: 20px;
+        width: 23.4%;
+        margin-right: 14px;
         height: auto;
         margin-bottom: 20px;
     }
 
     &__no {
         margin: 0 auto;
-        font-size: 17px;
+        font-size: 1.7rem;
         color: #a2a2a2;
     }
 }
