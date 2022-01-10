@@ -9,19 +9,20 @@
                 <input v-if="!showEdit" id="file-input" type="file" style="display:none" name="name" accept="image/png, image/jpg, image/jpeg" ref="upload"  @change="uploadImage"/>
             </div>
             <div class="profile__main-info">
-                <div class="field"><strong v-show="showEdit">{{content.name}}</strong><input v-show="!showEdit" v-model="content.name"/></div>
-                <div class="field"><strong v-show="showEdit">{{content.lastname}}</strong><input v-show="!showEdit" v-model="content.lastname"/></div>
-                <p>Дата рождения: <span v-show="showEdit">{{birthday ? birthday : convertDate(content.birthday)}}</span><input v-show="!showEdit" :value="birthday" @input="birthday = $event.target.value; content.birthday = $event.target.value"/></p>
-                <p>Компания: <span v-show="showEdit">{{content.company}}</span><input v-show="!showEdit" v-model="content.company"/></p>
+                <div class="field"><strong v-show="showEdit">{{content.name}}</strong><input v-show="!showEdit" v-model="content.name" autocomplete="off"/></div>
+                <div class="field"><strong v-show="showEdit">{{content.lastname}}</strong><input v-show="!showEdit" v-model="content.lastname" autocomplete="off"/></div>
+                <p>Дата рождения: <span v-show="showEdit">{{birthday ? birthday : (content.birthday && convertDate(content.birthday))}}</span><input v-show="!showEdit" :value="birthday" @input="birthday = $event.target.value; content.birthday = $event.target.value" autocomplete="off" v-mask="'##.##.####'"/></p>
+                <p>Компания: <span v-show="showEdit">{{content.company}}</span><input v-show="!showEdit" v-model="content.company" autocomplete="off"/></p>
+                <p>Должность: <span v-show="showEdit">{{content.status}}</span><input v-show="!showEdit" v-model="content.status" autocomplete="off"/></p>
             </div>
             </div>
             <div class="profile__full-info">
-                <p>E-mail: <a v-show="showEdit" :href="'mailto:'+content.email">{{content.email}}</a><input v-show="!showEdit" v-model="content.email"/></p>
-                <p>Телефон: <a v-show="showEdit" :href="'tel:'+content.phone">{{content.phone}}</a><input v-show="!showEdit" v-model="content.phone"/></p>
-                <p>Адрес: <span v-show="showEdit">{{content.address}}</span><input v-show="!showEdit" v-model="content.address"/></p>
-                <p>Количество статей: <span v-show="showEdit">{{countOfArticle}}</span><input v-show="!showEdit" disabled="disabled"/></p>
-                <p>О себе: <span v-show="showEdit">{{content.about}}</span><textarea v-show="!showEdit" v-model="content.about"/></p>
-            
+                <p>E-mail: <a v-show="showEdit" :href="'mailto:'+content.email">{{content.email}}</a><input v-show="!showEdit" v-model="content.email" autocomplete="off"/></p>
+                <p>Телефон: <a v-show="showEdit" :href="'tel:'+content.phone">{{content.phone}}</a><input v-show="!showEdit" v-model="content.phone" autocomplete="off"/></p>
+                <p>Адрес: <span v-show="showEdit">{{content.address}}</span><input v-show="!showEdit" v-model="content.address" autocomplete="off"/></p>
+                <p>Количество статей: <span >{{countOfArticle}}</span></p>
+                <p>О себе: <span v-show="showEdit">{{content.about}}</span><textarea v-show="!showEdit" v-model="content.about" autocomplete="off"/></p>
+                <div class="profile-button modal-button" v-if="!isFriendPage" @click="scrapping">scrapping</div>
         </div>
         <button class="profile-button modal-button" @click="saveChanges" v-show="!showEdit">Сохранить</button>
         <div class="edit-button" v-if="!isFriendPage" @click="showEdit=!showEdit"/>
@@ -29,7 +30,12 @@
 </template>
 <script>
     import AuthAPI from "@/services/APIServiceAuth.js"
-    import {mapState} from 'vuex';
+    import API, {APIServiceResource} from "@/services/APIServiceResource.js"
+    import {mapState} from 'vuex'
+    import Vue from "vue"
+    import VueMask from 'v-mask'
+
+    Vue.use(VueMask);
 
     export default {
         name: 'profile-component',
@@ -71,14 +77,44 @@
             }
         },
         methods: {
+            async scrapping() {
+                this.isLoading = true;
+                let data = '';
+                var form_data = new FormData();
+                const requestBody = {
+                authors_all: '',
+                pagenum: null,
+                authorbox_name: null,
+                selid: null,
+                orgid: null,
+                orgadminid: null,
+                surname: null,
+                codetype: 'SPIN',
+                codevalue: '9042-5877',
+                town: null,
+                countryid: null,
+                orgname: null,
+                rubriccode: null,
+                metrics: 1,
+                sortorder: 0,
+                order: 0
+                }
+
+                for ( var key in requestBody ) {
+                form_data.append(key, requestBody[key]);
+                }
+                data = await API.createResource(APIServiceResource.ResourceType.scrapping, requestBody);
+                console.log(await data);
+                this.isLoading = false;
+            },
             async saveChanges() {
                 this.isLoading = true;
 
-                const date = this.content.birthday.split('.');
-                console.log(date);
-                const dateForServ = new Date(date[2], date[1], date[0]);
-                this.content.birthday = dateForServ.toISOString();
-                console.log(this.content.birthday);
+                if (this.content.birthday && this.content.birthday.toString().includes('.')){
+                    const date = this.content.birthday.split('.');
+                    const dateForServ = new Date(date[2], date[1]==='12' ? '11' : date[1], date[0]);
+                    this.content.birthday = dateForServ.toISOString();
+                }
 
                 await AuthAPI.editUser(this.content);
                 this.isLoading = false;
@@ -110,6 +146,13 @@
     .profile{
         position: relative;
         width:100%;
+
+        &__main-info {
+            input {
+                width: 22rem !important;
+            }
+        }
+
         &-button{
             margin-top: 5rem;
         }

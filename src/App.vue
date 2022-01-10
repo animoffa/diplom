@@ -119,7 +119,6 @@
             margin-left: 3rem;
             padding: 0 2rem;
             position: relative;
-            z-index: 11;
             appearance: none;
             height: 4rem;
             cursor: pointer;
@@ -148,7 +147,6 @@
             position: relative;
             left: -3rem;
             top: 0.1rem;
-            z-index: 1;
             width: 1.5rem;
 
         }
@@ -169,7 +167,12 @@
         font-size: 1.8rem;
         position: relative;
         background-size: 2.5rem;
+
+        @media (max-width: 768px) {
+            width: 10rem !important;
+        }
     }
+
 
     .search-input:focus {
         background: none;

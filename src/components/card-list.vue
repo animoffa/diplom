@@ -42,12 +42,11 @@
                 <form>
                     <div class="modal-body">
                         <div class="title"> {{card.title}}</div>
-                        <div class="subtitle"> {{card.author.name}}</div>
+                        <div class="subtitle"> {{card.author.name}} {{card.author.lastname}}</div>
                         <p class="article__body" v-html="card.text"></p>
                         <div class="mark-container">
                             <div class="mark__my">
                                 <span>Оцените статью: </span>
-                                <!-- <Stars :mark="userMark" @change-mark="changeMark"/> -->
                                 <div class="star" :class="{'liked':userMark}" @click="changeMark">★</div>
                             </div>
                             <div class="mark__our">
@@ -64,8 +63,9 @@
                         <ul>
                             <li class="open-book__li" v-for="(item,i) of card.commentList" :key="i"
                             >
-                                <div class="open-book__img"> 
-                                    <img src="../assets/img/user.png"/>
+                                <div class="open-book__img">
+                                    <img v-if="user && user.img" :src="user.img"/>
+                                    <img v-else src="../assets/img/user.png"/>
                                 </div>
                                 <div class="open-book__content">
                                 <p class="open-book__author">{{item.author && item.author.name}} {{item.author && item.author.lastname}}</p>
@@ -160,7 +160,7 @@
         },
         methods: {
             formatDate(date) {
-                const newDate = new Date(date);
+                const newDate = new Date(date * 1000);
                 return `${newDate.getDate()}.${newDate.getMonth() + 1 > 9 ? newDate.getMonth() + 1 : '0' + (newDate.getMonth() + 1)}.${newDate.getFullYear()}`;
             },
             isUserLikedArticle() {
@@ -303,6 +303,10 @@
         font-size: 1.7rem;
         margin-bottom: 5rem;
         margin-top: 5rem;
+
+        &:first-letter {
+            text-transform: uppercase;
+        }
 
         a {
             line-height: 145%;

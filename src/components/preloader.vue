@@ -33,7 +33,7 @@
                     </svg>
                 </li>
             </ul>
-        </div><span>Loading</span>
+        </div><span>Пожалуйста подождите...</span>
     </div>
 </template>
 <script>
@@ -43,15 +43,19 @@
 </script>
 <style scoped>
     .loader {
-        --background: linear-gradient(135deg, #23C4F8, #275EFE);
-        --shadow: rgba(39, 94, 254, 0.28);
+
+        --background: linear-gradient(135deg, #1d7c1470, #1468296b);
+        --shadow: rgba(19, 99, 32, 0.28);
         --text: #6C7486;
         --page: rgba(255, 255, 255, 0.36);
         --page-fold: rgba(255, 255, 255, 0.52);
         --duration: 3s;
         width: 200px;
         height: 140px;
-        position: relative;
+        position: absolute;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        left: 50%;
     }
     .loader:before, .loader:after {
         --r: -6deg;
@@ -136,6 +140,7 @@
         display: block;
         left: 0;
         right: 0;
+        font-size: 1.7rem;
         top: 100%;
         margin-top: 20px;
         text-align: center;

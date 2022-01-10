@@ -1,6 +1,6 @@
 <template>
     <div class="user-template">
-        <template  v-if="isLoading">
+        <template  v-if="!(user && user.name)">
            <Preloader/>
         </template>
         <template v-else>
@@ -42,6 +42,7 @@
                         :is="bigTabItemsFactory(this.activeTab)"
                         :key="`${this.activeTab}-block`"
                         @open-friend-page="openColleguePage"
+                        @fetch-cards="fetchCards"
                         />
                 </div>
             </div>
@@ -92,6 +93,9 @@
                 this.sidebarList.push({name:`${user.name} ${user.lastname}`, query:`user${user.id}`, isDeletable: true})
                 this.changeTab(`user${user.id}`);
             },
+            fetchCards() {
+              this.$store.dispatch('articles/getArticles');
+            },
             deleteSidebarItem(id) {
                 this.changeTab('profile');
                 this.sidebarList.splice(id,1);
@@ -124,6 +128,7 @@
 <style lang="less" scoped>
     .user-template{
         width:94%;
+        min-height: 100vh;
         margin: 0 auto;
     }
     .sidebar__item {
@@ -132,7 +137,7 @@
         justify-content: space-between;
     }
     .sidebar__delete-btn {
-        font-size: 10px;
+        font-size: 1rem;
     }
     .menu__nav{
         display: flex;
@@ -144,6 +149,9 @@
         }
         a:hover{
             color:#47664e;
+        }
+        @media (max-width: 768px) {
+            display: none;
         }
     }
     .user-content{

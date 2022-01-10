@@ -79,10 +79,10 @@
     }
 
     .error-window {
-        background: #fadcd7;
-        border: 1px solid #ff9494;
-        border-radius: 2rem;
-        width: 95%;
+        background: #ffeceba8;
+        border: 1px solid #ff0000;
+        border-radius: 1rem;
+        width: 100%;
         padding: 1rem 2rem;
 
         li{
@@ -99,7 +99,7 @@
         display: flex;
         background: white;
         flex-direction: column;
-        padding: 4rem 7rem 3rem;
+        padding: 4rem 4rem 3rem;
         border-radius: 3rem;
         box-shadow: 10px 9px 18px 10px rgba(207, 207, 207, 27%);
         -webkit-box-shadow: 10px 9px 18px 10px rgba(207, 207, 207, 27%);

@@ -1,10 +1,9 @@
 <template>
-    <div>
-        <!-- <template  v-if="isLoading">
+    <div class="main">
+        <template  v-if="!(user && user.name)">
            <Preloader/>
-        </template> -->
-        <template >
-       
+        </template>
+        <template v-else>
         <div class="menu">
           <div class="title">
             <a href="/"><h1>quickDoc</h1></a>
@@ -60,8 +59,9 @@
 </template>
 <script>
     import CardList from "@/components/card-list"
-    import { mapState } from 'vuex';
-// import Preloader from "@/components/preloader"
+    import { mapState } from 'vuex'
+    import Preloader from "@/components/preloader"
+
     export default {
         data() {
             return {
@@ -76,7 +76,7 @@
         },
         components: {
             CardList,
-            // Preloader
+            Preloader
         },
 
         async mounted() {
@@ -86,6 +86,7 @@
             }
         },
         created() {
+          this.isLoading = true;
           this.$store.dispatch('client/getUser');
           this.$store.dispatch('articles/getArticles');
         },
@@ -155,11 +156,26 @@
 </script>
 
 <style lang="less">
+    .main {
+        min-height:100vh;
+        position: relative;
+        width: 100%;
+    }
     .main__img-user {
         width: 25px;
         height: 25px;
         object-fit: cover;
+        margin-bottom: 2px;
         border-radius: 50%;
+
+        @media(max-width: 1280px) {
+            width: 15px;
+            height: 15px;
+        }
+         @media(max-width: 768px) {
+            width: 3rem;
+            height: 3rem;
+        }
     }
     .user {
         font-size: 1.8rem;
@@ -183,14 +199,18 @@
         a:hover{
             color:#47664e;
         }
+
+        @media (max-width: 768px) {
+            display: none !important;
+        }
     }
 
     .img {
         width: 3rem;
         height: 2.3rem;
         @media (max-width: 768px) {
-            width: 4.5rem;
-            height: 4.5rem;
+            width: 3rem;
+            height: 3rem;
         }
     }
 

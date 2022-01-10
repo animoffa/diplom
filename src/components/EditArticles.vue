@@ -102,14 +102,13 @@ export default  ({
                 }
             },
          async deleteCard(id) {
-                this.cards = this.cards.filter(book => {
-                   return book.id !== id});
-
-                // try {
-                //     await API.deleteResource(APIServiceResource.ResourceType.books, id);
-                // } catch (e) {
-                //     console.error("Error while fetching: " + e.toString());
-                // }
+            
+                    try {
+                        await ResourceAPI.deleteResource(APIServiceResource.ResourceType.articles, id);
+                        this.$emit('fetch-cards');
+                    } catch (e) {
+                        console.error("Error while fetching: " + e.toString());
+                    }
             },
           paginate(cards) {
                 let page = this.page;
@@ -150,7 +149,7 @@ export default  ({
     }
 }
 .no-articles {
-    font-size: 17px;
+    font-size: 1.7rem;
     color: #a2a2a2;
 }
 .books-container-table {

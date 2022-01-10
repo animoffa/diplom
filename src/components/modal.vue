@@ -75,6 +75,10 @@
         max-height: 85%;
         overflow: auto;
 
+        @media (max-width: 768px) {
+            width: 95%;
+        }
+
 
         .textarea-container {
             display: flex;
@@ -98,6 +102,11 @@
             width: 2.5rem;
             height: 2.5rem;
             line-height: 2.4rem;
+
+            @media (max-width: 768px) {
+                top: 2.3rem;
+                left: 92%;
+            }
 
         }
 
@@ -184,7 +193,7 @@
             width: 100%;
             margin: 0.5rem 0;
             display: flex;
-            padding-bottom: 15px;
+            padding-bottom: 5px;
             border-bottom: 1px solid #eeeeee;
 
             &:first-letter {
@@ -193,7 +202,7 @@
         }
         .open-book__author {
             padding-left: 1rem;
-            font-size: 15px;
+            font-size: 1.5rem;
             font-weight: 600;
             color: #477251;
         }
@@ -213,8 +222,15 @@
             flex-direction: column;
         }
         .open-book__img {
-            width: 5.5rem;
-            height: 5.5rem;
+            width: 6rem;
+            height: 6rem;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                border-radius: 50%;
+            }
         }
         .open-book__buttons{
             display: flex;
@@ -228,7 +244,7 @@
             span {
                 width: 100%;
                 font-size: 1.8rem;
-                padding: 0.2rem 1rem 1.5rem;
+                padding: 0.2rem 1rem 0rem;
                 min-height: 4.5rem;
                 display: block;
 
@@ -293,6 +309,10 @@
             font-weight: 800;
             font-size: 2.5rem;
             margin: 6rem 0 2rem;
+
+            &:first-letter {
+                text-transform: uppercase;
+            }
         }
         .subtitle{
             text-align: initial;
@@ -313,7 +333,7 @@
         background: white;
         padding: 0 2rem;
         height: 5rem;
-        width: 95%;
+        width: 100%;
         margin: 2.5rem 0;
     }
 </style>

@@ -17,13 +17,6 @@
                 </div>
             </div>
         </div>
-        <div class="back">
-            <h2>Удалить?</h2>
-            <div class="button-container">
-                <div class="button-delete button" v-on:click="deleteBook">Да</div>
-                <div class=" button" v-on:click="isDeleteClicked=!isDeleteClicked">Нет</div>
-            </div>
-        </div>
     </div>
 </template>
 
@@ -114,6 +107,10 @@
             -webkit-line-clamp: 4;
             -webkit-box-orient: vertical;  
             overflow: hidden;
+
+            & p:first-letter {
+                text-transform: uppercase;
+            }
         }
         .card__likes{
             display: flex;
@@ -121,7 +118,7 @@
         }
 
         .card__like-count{
-            font-size: 15px;
+            font-size: 1.5rem;
             margin-top: 3px;
             margin-left: 10px;
         }

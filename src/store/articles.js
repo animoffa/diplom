@@ -7,6 +7,7 @@ export const mutations = {
  
   setArticles(state, payload) {
     state.articles = payload
+    console.log(payload);
   },
 };
 

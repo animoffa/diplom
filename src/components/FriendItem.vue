@@ -4,11 +4,13 @@
                 <img v-if="user && user.img" :src="user.img"/>
                 <img v-else class="default" src="../assets/img/userBig.png"/>
         </div>
-        <div class="friend__name title">
-            {{user.name}} {{user.lastname}}
-        </div>
-        <div class="friend__count">
-            Количество статей: {{countOfArticles}}
+        <div>
+            <div class="friend__name title">
+                {{user.name}} {{user.lastname}}
+            </div>
+            <div class="friend__count">
+                Количество статей: {{countOfArticles}}
+            </div>
         </div>
     </div>
 </template>
@@ -50,7 +52,8 @@
         flex-direction: column;
         border-radius: 1rem;
         align-items: flex-start;
-        padding: 3.5rem 4rem 2.6rem;
+        padding: 3.5rem 2.5rem 2.6rem;
+        justify-content: space-between;
 
         &__photo {
             width:100%;
@@ -59,22 +62,23 @@
 
             img {
                 width: 100%;
-                min-height: 165px;
+                height: 175px;
                 border-radius: 6px;
                 object-fit: cover;
                 &.default {
                     min-height: none;
                     height: auto;
                     object-fit: contain;
-                    width: 60%;
+                    width: 90%;
                 }
             }
         }
 
         &__count {
-            font-size: 14px;
+            font-size: 1.4rem;
             color: #6b6b6b;
             margin-top: 2px;
+            text-align: left;
         }
 
         .actions {
