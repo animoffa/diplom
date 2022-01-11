@@ -22,18 +22,25 @@
                 <p>Адрес: <span v-show="showEdit">{{content.address}}</span><input v-show="!showEdit" v-model="content.address" autocomplete="off"/></p>
                 <p>Количество статей: <span >{{countOfArticle}}</span></p>
                 <p>О себе: <span v-show="showEdit">{{content.about}}</span><textarea v-show="!showEdit" v-model="content.about" autocomplete="off"/></p>
-                <div class="profile-button modal-button" v-if="!isFriendPage" @click="scrapping">scrapping</div>
+                <div class="profile-button modal-button" v-if="!isFriendPage" @click="scrapeArticles">scrapping</div>
         </div>
         <button class="profile-button modal-button" @click="saveChanges" v-show="!showEdit">Сохранить</button>
         <div class="edit-button" v-if="!isFriendPage" @click="showEdit=!showEdit"/>
+        <div class="rinc" v-if="!isFriendPage">
+            <p class="rinc__title">Введите свой spin-код для того, что бы получить доступ к своим публикациям включенным в РИНЦ</p>
+            <div class="rinc__content">SPIN-код: 
+            <span v-show="showEdit && content.spin">{{content.spin}}</span>
+            <div class="rinc__input"><input v-model="content.spin" autocomplete="off"/><div class="profile-button modal-button"  @click="scrapping">найти</div></div></div>
+        </div>
     </div>
 </template>
 <script>
     import AuthAPI from "@/services/APIServiceAuth.js"
-    import API, {APIServiceResource} from "@/services/APIServiceResource.js"
+    // import API, {APIServiceResource} from "@/services/APIServiceResource.js"
     import {mapState} from 'vuex'
     import Vue from "vue"
     import VueMask from 'v-mask'
+    import * as cheerio from 'cheerio'
 
     Vue.use(VueMask);
 
@@ -45,7 +52,346 @@
                 image_file: null,
                 isFriendPage: false,
                 friendId: 0, 
-                birthday: ''
+                birthday: '',
+                eLibResponse: `<table width=580 cellspacing=0 cellpadding=3 id="restab" style="border-spacing: 0px 4px;">
+<tr align=center valign=middle height=15>
+<td width=34 class="midtext"><font color=#000000>&nbsp;<b>№</b></font></td>
+<td width=24>&nbsp;</td>
+<td width=364 class="midtext"><font color=#000000><b>Автор</b></font></td>
+<td width=54 align=left class="midtext"><span title="Число публикаций автора в РИНЦ"><font color=#000000><b>Публ.</b></font></span></td>
+<td width=24 class="midtext"><span title="Число цитирований публикаций автора из РИНЦ"><font color=#000000><b>Цит.</b></font></span></td>
+<td width=44 class="midtext"><span title="Индекс Хирша автора в РИНЦ"><font color=#000000><b>Хирш</b></font></span></td></tr>
+<tr><td colspan=6>
+<div style="width: 574px;" class="table-line"></div>
+</td></tr>
+<tr><td colspan=6 height=0></td></tr>
+
+<tr valign=top id="a33961" bgcolor=#f5f5f5>
+<td align=center class="midtext select-tr-left"><font color=#00008f><div style="margin-top:8px;"><b>1.</b></div></font><br></td>
+<td align=center><div style="margin-top:7px;"><input type=checkbox name="tid33961" id="tid33961"  onClick='if (document.getElementById("tid33961").checked) {RowSelect("a33961",1)} else {RowSelect("a33961",0)}'></div></td>
+<td align=left class="midtext"><font color=#00008f><b>Панин&nbsp; Владимир&nbsp; Алексеевич</b></font><span class="aster" title="Автор зарегистрирован в SCIENCE INDEX">*</span>
+<br>
+Тульский государственный педагогический университет им. Л.Н. Толстого (Тула)
+</td>
+
+
+<td nowrap align=right class="midtext"><div style="margin-top:8px;"><a href="author_items.asp?authorid=33961&pubrole=100&show_refs=1&show_option=0" title="Список публикаций данного автора в РИНЦ">126</a><a href="author_profile.asp?id=33961" title="Анализ публикационной активности автора"><img src="/pic/stat.gif" width=12 height=13 hspace=10 border=0></a></div></td>
+<td nowrap align=center class="midtext"><div style="margin-top:8px;"><a href="javascript:show_author_refs(33961)" title="Список цитирований работ данного автора из публикаций, входящих в РИНЦ">256</a></div></td><td nowrap align=center class="midtext select-tr-right"><div style="margin-top:8px;">7</div></td></tr>
+
+
+
+<input type="hidden" id="hid33961" name="hid33961" value="Панин В А">
+
+</table>`,
+        eLibArticles: `<table width="580" cellspacing="0" cellpadding="3" id="restab" style="border-spacing: 0px 4px;">
+<tbody><tr align="center" valign="middle" height="15">
+<td width="24"><font color="#555555">&nbsp;<b>№</b></font></td>
+<td width="514"><font color="#555555"><b>Публикация</b></font></td>
+<td width="24"><span title="Число цитирований публикации в РИНЦ"><font color="#555555"><b>Цит.</b></font></span></td></tr>
+<tr><td colspan="3">
+<div style="width: 574px;" class="table-line"></div>
+</td></tr>
+
+<tr><td colspan="3" height="0"></td></tr>
+
+
+<tr valign="middle" id="arw46539589">
+<td align="center" valign="top" class="select-tr-left"><a name="x46539589"></a>
+<font color="#00008f"><b>1.</b></font><br><input type="checkbox" name="tid46539589" id="tid46539589" onclick="if (this.checked) {RowSelect(&quot;arw46539589&quot;,1)} else {RowSelect(&quot;arw46539589&quot;,0)}"><div id="pdf_46539589" name="pdf_46539589"><a href="javascript:load_article(46539589)"><img src="/images/download_green.png" width="16" vspace="3" border="0" title="Доступ к полному тексту открыт"></a>
+
+</div></td>
+<td align="left" valign="top">
+
+<a href="/item.asp?id=46539589"><b><span style="line-height:1.0;">МОДЕЛИРОВАНИЕ ПРОЦЕССА ВОЗБУЖДЕНИЯ ЭЛЕКТРОМАГНИТНЫХ КОЛЕБАНИЙ В ОТКРЫТОМ ВАКУУМНОМ РЕЗОНАТОРЕ</span></b></a><br><font color="#00008f"><i>Бобылев Ю.В., Панин В.А.</i></font><br>
+<font color="#00008f">
+ В сборнике: Алгебра, теория чисел, дискретная геометрия и многомасштабное моделирование: современные проблемы, приложения и проблемы истории.&nbsp;Материалы XIX Международной конференции, посвящённой 200-летию со дня рождения академика П.Л. Чебышёва. Тула, 2021.  С. 357-361.
+</font></td><td align="center" valign="middle" class="select-tr-right">
+0</td></tr>
+
+
+
+<tr valign="middle" id="arw46539590">
+<td align="center" valign="top" class="select-tr-left"><a name="x46539590"></a>
+<font color="#00008f"><b>2.</b></font><br><input type="checkbox" name="tid46539590" id="tid46539590" onclick="if (this.checked) {RowSelect(&quot;arw46539590&quot;,1)} else {RowSelect(&quot;arw46539590&quot;,0)}"><div id="pdf_46539590" name="pdf_46539590"><a href="javascript:load_article(46539590)"><img src="/images/download_green.png" width="16" vspace="3" border="0" title="Доступ к полному тексту открыт"></a>
+
+</div></td>
+<td align="left" valign="top">
+
+<a href="/item.asp?id=46539590"><b><span style="line-height:1.0;">ЧИСЛЕННОЕ МОДЕЛИРОВАНИЕ ВОЗБУЖДЕНИЯ ЭЛЕКТРОМАГНИТНЫХ КОЛЕБАНИЙ ОТКРЫТОГО ПЛАЗМЕННОГО РЕЗОНАТОРА</span></b></a><br><font color="#00008f"><i>Бобылев Ю.В., Мещерякова Т.Г., Панин В.А.</i></font><br>
+<font color="#00008f">
+ В сборнике: Алгебра, теория чисел, дискретная геометрия и многомасштабное моделирование: современные проблемы, приложения и проблемы истории.&nbsp;Материалы XIX Международной конференции, посвящённой 200-летию со дня рождения академика П.Л. Чебышёва. Тула, 2021.  С. 361-365.
+</font></td><td align="center" valign="middle" class="select-tr-right">
+0</td></tr>
+
+
+
+<tr valign="middle" id="arw46115079">
+<td align="center" valign="top" class="select-tr-left"><a name="x46115079"></a>
+<font color="#00008f"><b>3.</b></font><br><input type="checkbox" name="tid46115079" id="tid46115079" onclick="if (this.checked) {RowSelect(&quot;arw46115079&quot;,1)} else {RowSelect(&quot;arw46115079&quot;,0)}"><div id="pdf_46115079" name="pdf_46115079"><a href="javascript:load_article(46115079)"><img src="/images/download_green.png" width="16" vspace="3" border="0" title="Доступ к полному тексту открыт"></a>
+
+</div></td>
+<td align="left" valign="top">
+
+<a href="/item.asp?id=46115079"><b><span style="line-height:1.0;">ЮРИЙ ФИЛИППОВИЧ ГОЛОВНЁВ (К 80-ЛЕТИЮ)</span></b></a><br><font color="#00008f"><i>Бобылев Ю.В., Добровольский Н.М., Панин В.А., Плотников А.П., Реброва И.Ю., Нургулеев Д.А., Добровольский Н.Н.</i></font><br>
+<font color="#00008f">
+<a href="/contents.asp?id=46115058">Чебышевский сборник</a>. 
+2021. 
+Т. 22. <a href="/contents.asp?id=46115058&amp;selid=46115079">№&nbsp;2&nbsp;(78)</a>.  С. 366-372.
+</font></td><td align="center" valign="middle" class="select-tr-right">
+0</td></tr>
+
+
+
+<tr valign="middle" id="arw46115082">
+<td align="center" valign="top" class="select-tr-left"><a name="x46115082"></a>
+<font color="#00008f"><b>4.</b></font><br><input type="checkbox" name="tid46115082" id="tid46115082" onclick="if (this.checked) {RowSelect(&quot;arw46115082&quot;,1)} else {RowSelect(&quot;arw46115082&quot;,0)}"><div id="pdf_46115082" name="pdf_46115082"><a href="javascript:load_article(46115082)"><img src="/images/download_green.png" width="16" vspace="3" border="0" title="Доступ к полному тексту открыт"></a>
+
+</div></td>
+<td align="left" valign="top">
+
+<a href="/item.asp?id=46115082"><b><span style="line-height:1.0;">КОМПЬЮТЕРНОЕ МОДЕЛИРОВАНИЕ ВОЗБУЖДЕНИЯ ЭЛЕКТРОМАГНИТНЫХ КОЛЕБАНИЙ ОТКРЫТОГО ПЛАЗМЕННОГО РЕЗОНАТОРА</span></b></a><br><font color="#00008f"><i>Бобылев Ю.В., Мещерякова Т.Г., Панин В.А.</i></font><br>
+<font color="#00008f">
+<a href="/contents.asp?id=46115058">Чебышевский сборник</a>. 
+2021. 
+Т. 22. <a href="/contents.asp?id=46115058&amp;selid=46115082">№&nbsp;2&nbsp;(78)</a>.  С. 402-416.
+</font></td><td align="center" valign="middle" class="select-tr-right">
+0</td></tr>
+
+
+
+<tr valign="middle" id="arw44390920">
+<td align="center" valign="top" class="select-tr-left"><a name="x44390920"></a>
+<font color="#00008f"><b>5.</b></font><br><input type="checkbox" name="tid44390920" id="tid44390920" onclick="if (this.checked) {RowSelect(&quot;arw44390920&quot;,1)} else {RowSelect(&quot;arw44390920&quot;,0)}"><div id="pdf_44390920" name="pdf_44390920"><a href="javascript:load_article(44390920)"><img src="/images/download_green.png" width="16" vspace="3" border="0" title="Доступ к полному тексту открыт"></a>
+
+</div></td>
+<td align="left" valign="top">
+
+<a href="/item.asp?id=44390920"><b><span style="line-height:1.0;">ИСПОЛЬЗОВАНИЕ РАЗЛИЧНЫХ МАТЕМАТИЧЕСКИХ МЕТОДОВ ПРИ ОПИСАНИИ ЭЛЕКТРОДИНАМИЧЕСКИХ ПРОЦЕССОВ В ПУЧКОВО-ПЛАЗМЕННЫХ СИСТЕМАХ</span></b></a><br><font color="#00008f"><i>Панин В.А., Бобылев Ю.В., Мещерякова Т.Г.</i></font><br>
+<font color="#00008f">
+ В сборнике: Решение проблем учебно-методического обеспечения при реализации ФГОС ВО 3++.&nbsp;Материалы XLVII научно-методической конференции профессорско-преподавательского состава, аспирантов, магистрантов, соискателей ТГПУ им. Л.Н. Толстого. Под общей редакцией В.А. Панина. 2020.  С. 234-236.
+</font></td><td align="center" valign="middle" class="select-tr-right">
+0</td></tr>
+
+
+
+<tr valign="middle" id="arw44367990">
+<td align="center" valign="top" class="select-tr-left"><a name="x44367990"></a>
+<font color="#00008f"><b>6.</b></font><br><input type="checkbox" name="tid44367990" id="tid44367990" onclick="if (this.checked) {RowSelect(&quot;arw44367990&quot;,1)} else {RowSelect(&quot;arw44367990&quot;,0)}"><div id="pdf_44367990" name="pdf_44367990"><a href="javascript:load_article(44367990)"><img src="/images/download_green.png" width="16" vspace="3" border="0" title="Доступ к полному тексту открыт"></a>
+
+</div></td>
+<td align="left" valign="top">
+
+<a href="/item.asp?id=44367990"><b><span style="line-height:1.0;">НЕКОТОРЫЕ ВОПРОСЫ ЧИСЛЕННОГО МОДЕЛИРОВАНИЯ ПУЧКОВО-ПЛАЗМЕННОЙ НЕУСТОЙЧИВОСТИ</span></b></a><br><font color="#00008f"><i>Бобылев Ю.В., Панин В.А.</i></font><br>
+<font color="#00008f">
+ В сборнике: АЛГЕБРА, ТЕОРИЯ ЧИСЕЛ И ДИСКРЕТНАЯ ГЕОМЕТРИЯ: СОВРЕМЕННЫЕ ПРОБЛЕМЫ, ПРИЛОЖЕНИЯ И ПРОБЛЕМЫ ИСТОРИИ.&nbsp;Материалы XVIII Международной конференции, посвященной 100-летию со дня рождения профессоров Б. М. Бредихина, В. И. Нечаева и С. Б. Стечкина. Тула, 2020.  С. 431-435.
+</font></td><td align="center" valign="middle" class="select-tr-right">
+0</td></tr>
+
+
+
+<tr valign="middle" id="arw44367993">
+<td align="center" valign="top" class="select-tr-left"><a name="x44367993"></a>
+<font color="#00008f"><b>7.</b></font><br><input type="checkbox" name="tid44367993" id="tid44367993" onclick="if (this.checked) {RowSelect(&quot;arw44367993&quot;,1)} else {RowSelect(&quot;arw44367993&quot;,0)}"><div id="pdf_44367993" name="pdf_44367993"><a href="javascript:load_article(44367993)"><img src="/images/download_green.png" width="16" vspace="3" border="0" title="Доступ к полному тексту открыт"></a>
+
+</div></td>
+<td align="left" valign="top">
+
+<a href="/item.asp?id=44367993"><b><span style="line-height:1.0;">ЧИСЛЕННОЕ МОДЕЛИРОВАНИЕ ВОЗБУЖДЕНИЯ ЭЛЕКТРОМАГНИТНЫХ КОЛЕБАНИЙ ОТКРЫТОГО ВАКУУМНОГО РЕЗОНАТОРА</span></b></a><br><font color="#00008f"><i>Панин В.А., Бобылев Ю.В.</i></font><br>
+<font color="#00008f">
+ В сборнике: АЛГЕБРА, ТЕОРИЯ ЧИСЕЛ И ДИСКРЕТНАЯ ГЕОМЕТРИЯ: СОВРЕМЕННЫЕ ПРОБЛЕМЫ, ПРИЛОЖЕНИЯ И ПРОБЛЕМЫ ИСТОРИИ.&nbsp;Материалы XVIII Международной конференции, посвященной 100-летию со дня рождения профессоров Б. М. Бредихина, В. И. Нечаева и С. Б. Стечкина. Тула, 2020.  С. 441-445.
+</font></td><td align="center" valign="middle" class="select-tr-right">
+0</td></tr>
+
+
+
+<tr valign="middle" id="arw44205062">
+<td align="center" valign="top" class="select-tr-left"><a name="x44205062"></a>
+<font color="#00008f"><b>8.</b></font><br><input type="checkbox" name="tid44205062" id="tid44205062" onclick="if (this.checked) {RowSelect(&quot;arw44205062&quot;,1)} else {RowSelect(&quot;arw44205062&quot;,0)}"><div id="pdf_44205062" name="pdf_44205062"><a href="javascript:load_article(44205062)"><img src="/images/download_green.png" width="16" vspace="3" border="0" title="Доступ к полному тексту открыт"></a>
+
+</div></td>
+<td align="left" valign="top">
+
+<a href="/item.asp?id=44205062"><b><span style="line-height:1.0;">ОБ ИЗУЧЕНИИ ДИФРАКЦИИ ЭЛЕКТРОМАГНИТНЫХ ВОЛН В КУРСАХ ОБЩЕЙ И ТЕОРЕТИЧЕСКОЙ ФИЗИКИ В ПЕДАГОГИЧЕСКОМ ВУЗЕ</span></b></a><br><font color="#00008f"><i>Панин В.А., Бобылев Ю.В., Паршкова Т.Г.</i></font><br>
+<font color="#00008f">
+ В сборнике: НОВАЦИИ И ТРАДИЦИИ В ПРЕПОДАВАНИИ ФИЗИКИ: ОТ ШКОЛЫ ДО ВУЗА.&nbsp;Сборник материалов VI международной научно-практической конференции. Под общей редакцией В. А. Панина. 2020.  С. 86-89.
+</font></td><td align="center" valign="middle" class="select-tr-right">
+0</td></tr>
+
+
+
+<tr valign="middle" id="arw44261660">
+<td align="center" valign="top" class="select-tr-left"><a name="x44261660"></a>
+<font color="#00008f"><b>9.</b></font><br><input type="checkbox" name="tid44261660" id="tid44261660" onclick="if (this.checked) {RowSelect(&quot;arw44261660&quot;,1)} else {RowSelect(&quot;arw44261660&quot;,0)}"><div id="pdf_44261660" name="pdf_44261660"></div></td>
+<td align="left" valign="top">
+
+<a href="/item.asp?id=44261660"><b><span style="line-height:1.0;">ЦИФРОВАЯ ПЛАТФОРМА ЭКОЛОГИЧЕСКОГО МОНИТОРИНГА ТУЛЬСКОЙ ОБЛАСТИ</span></b></a><br><font color="#00008f"><i>Панин В.А., Привалов А.Н., Варнавская С.Е.</i></font><br>
+<font color="#00008f">
+ В книге: Тезисы докладов 2-ой научно-практической конференции учёных России и Хорватии в Дубровнике.&nbsp;Сборник. Составители: Н.А. Коротченко, А.П. Кутовская
+. Москва, 2020.  С. 94-95.
+</font></td><td align="center" valign="middle" class="select-tr-right">
+1</td></tr>
+
+
+
+<tr valign="middle" id="arw44261661">
+<td align="center" valign="top" class="select-tr-left"><a name="x44261661"></a>
+<font color="#00008f"><b>10.</b></font><br><input type="checkbox" name="tid44261661" id="tid44261661" onclick="if (this.checked) {RowSelect(&quot;arw44261661&quot;,1)} else {RowSelect(&quot;arw44261661&quot;,0)}"><div id="pdf_44261661" name="pdf_44261661"></div></td>
+<td align="left" valign="top">
+
+<a href="/item.asp?id=44261661"><b><span style="line-height:1.0;">DIGITAL PLATFORM FOR ENVIRONMENTAL MONITORING OF THE TULA REGION</span></b></a><br><font color="#00008f"><i>Panin V., Privalov A., Varnavskaya S.</i></font><br>
+<font color="#00008f">
+ В книге: .&nbsp;Сборник. Составители: Н.А. Коротченко, А.П. Кутовская
+. Москва, 2020.  С. 95-96.
+</font></td><td align="center" valign="middle" class="select-tr-right">
+0</td></tr>
+
+
+
+<tr valign="middle" id="arw38534573">
+<td align="center" valign="top" class="select-tr-left"><a name="x38534573"></a>
+<font color="#00008f"><b>11.</b></font><br><input type="checkbox" name="tid38534573" id="tid38534573" onclick="if (this.checked) {RowSelect(&quot;arw38534573&quot;,1)} else {RowSelect(&quot;arw38534573&quot;,0)}"><div id="pdf_38534573" name="pdf_38534573"><a href="javascript:load_article(38534573)"><img src="/images/download_green.png" width="16" vspace="3" border="0" title="Доступ к полному тексту открыт"></a>
+
+</div></td>
+<td align="left" valign="top">
+
+<a href="/item.asp?id=38534573"><b><span style="line-height:1.0;">APPLICATION OF GAME THEORY TO OPTIMIZE PARALLEL COMPUTING WHEN MODELING THE STRENGTH CHARACTERISTICS OF PRODUCTS OF ADDITIVE TECHNOLOGIES</span></b></a><br><font color="#00008f"><i>Panin V.A., Privalov A.N., Bogatyreva Yu.I.</i></font><br>
+<font color="#00008f">
+<a href="/contents.asp?id=38534559">Information Innovative Technologies</a>. 
+2019. 
+Т. 1. <a href="/contents.asp?id=38534559&amp;selid=38534573">№&nbsp;1</a>.  С. 76-83.
+</font></td><td align="center" valign="middle" class="select-tr-right">
+0</td></tr>
+
+
+
+<tr valign="middle" id="arw35173830">
+<td align="center" valign="top" class="select-tr-left"><a name="x35173830"></a>
+<font color="#00008f"><b>12.</b></font><br><input type="checkbox" name="tid35173830" id="tid35173830" onclick="if (this.checked) {RowSelect(&quot;arw35173830&quot;,1)} else {RowSelect(&quot;arw35173830&quot;,0)}"><div id="pdf_35173830" name="pdf_35173830">
+<a href="javascript:url_article(35173830, 1)" rel="nofollow"><img src="/images/download_blue.png" width="16" vspace="3" border="0" title="Полный текст доступен на внешнем сайте"></a>
+</div></td>
+<td align="left" valign="top">
+
+<a href="/item.asp?id=35173830"><b><span style="line-height:1.0;">ФИЗИКИ - ТВОРЦЫ ЭЛЕКТРОМАГНЕТИЗМА</span></b></a><br><font color="#00008f"><i>Бобылев Ю.В., Грибков А.И., Панин В.А., Романов Р.В., Сидоров Г.В.</i></font><br>
+<font color="#00008f">
+иллюстрированный биографический справочник.Электронный ресурс / Тула, 2018. 
+</font></td><td align="center" valign="middle" class="select-tr-right">
+1</td></tr>
+
+
+
+<tr valign="middle" id="arw35528760">
+<td align="center" valign="top" class="select-tr-left"><a name="x35528760"></a>
+<font color="#00008f"><b>13.</b></font><br><input type="checkbox" name="tid35528760" id="tid35528760" onclick="if (this.checked) {RowSelect(&quot;arw35528760&quot;,1)} else {RowSelect(&quot;arw35528760&quot;,0)}"><div id="pdf_35528760" name="pdf_35528760"><a href="javascript:load_article(35528760)"><img src="/images/download_green.png" width="16" vspace="3" border="0" title="Доступ к полному тексту открыт"></a>
+
+</div></td>
+<td align="left" valign="top">
+
+<a href="/item.asp?id=35528760"><b><span style="line-height:1.0;">ФИЗИКО-МАТЕМАТИЧЕСКИЕ ИССЛЕДОВАНИЯ В ТГПУ ИМ. Л. Н. ТОЛСТОГО ЗА 80 ЛЕТ</span></b></a><br><font color="#00008f"><i>Панин В.А., Подрезов К.А., Реброва И.Ю.</i></font><br>
+<font color="#00008f">
+ В сборнике: Алгебра, теория чисел и дискретная геометрия: современные проблемы и приложения.&nbsp;Материалы XV Международной конференции, посвященной столетию со дня рождения профессора Николая Михайловича Коробова. 2018.  С. 51-53.
+</font></td><td align="center" valign="middle" class="select-tr-right">
+0</td></tr>
+
+
+
+<tr valign="middle" id="arw35392660">
+<td align="center" valign="top" class="select-tr-left"><a name="x35392660"></a>
+<font color="#00008f"><b>14.</b></font><br><input type="checkbox" name="tid35392660" id="tid35392660" onclick="if (this.checked) {RowSelect(&quot;arw35392660&quot;,1)} else {RowSelect(&quot;arw35392660&quot;,0)}"><div id="pdf_35392660" name="pdf_35392660"><a href="javascript:load_article(35392660)"><img src="/images/download_green.png" width="16" vspace="3" border="0" title="Доступ к полному тексту открыт"></a>
+
+</div></td>
+<td align="left" valign="top">
+
+<a href="/item.asp?id=35392660"><b><span style="line-height:1.0;">OPTIMIZATION OF THE SOFTWARE OF THE EXPERIMENTAL STAND FOR THE EVALUATION OF THE STRESS-STRAIN STATE OF THE PRODUCT OBTAINED USING ADDITIVE TECHNOLOGIES</span></b></a><br><font color="#00008f"><i>Panin V.A., An P., Bogatyreva Yu.I.</i></font><br>
+<font color="#00008f">
+<a href="/contents.asp?id=35392637">Information Innovative Technologies</a>. 
+2018. 
+<a href="/contents.asp?id=35392637&amp;selid=35392660">№&nbsp;1</a>.  С. 87-92.
+</font></td><td align="center" valign="middle" class="select-tr-right">
+0</td></tr>
+
+
+
+<tr valign="middle" id="arw28858655">
+<td align="center" valign="top" class="select-tr-left"><a name="x28858655"></a>
+<font color="#00008f"><b>15.</b></font><br><input type="checkbox" name="tid28858655" id="tid28858655" onclick="if (this.checked) {RowSelect(&quot;arw28858655&quot;,1)} else {RowSelect(&quot;arw28858655&quot;,0)}"><div id="pdf_28858655" name="pdf_28858655"></div></td>
+<td align="left" valign="top">
+
+<a href="/item.asp?id=28858655"><b><span style="line-height:1.0;">ТЕРМОДИНАМИКА И МОЛЕКУЛЯРНАЯ ФИЗИКА В ЗАДАЧАХ</span></b></a><br><font color="#00008f"><i>Бобылев Ю.В., Грибков А.И., Панин В.А., Романов Р.В.</i></font><br>
+<font color="#00008f">
+учебное пособие / Тула, 2017. 
+</font></td><td align="center" valign="middle" class="select-tr-right">
+2</td></tr>
+
+
+
+<tr valign="middle" id="arw29848138">
+<td align="center" valign="top" class="select-tr-left"><a name="x29848138"></a>
+<font color="#00008f"><b>16.</b></font><br><input type="checkbox" name="tid29848138" id="tid29848138" onclick="if (this.checked) {RowSelect(&quot;arw29848138&quot;,1)} else {RowSelect(&quot;arw29848138&quot;,0)}"><div id="pdf_29848138" name="pdf_29848138"></div></td>
+<td align="left" valign="top">
+
+<a href="/item.asp?id=29848138"><b><span style="line-height:1.0;">КРАТКИЙ КУРС МЕХАНИКИ</span></b></a><br><font color="#00008f"><i>Бобылев Ю.В., Грибков А.И., Панин В.А., Романов Р.В.</i></font><br>
+<font color="#00008f">
+учебное пособие / Тула, 2017. 
+</font></td><td align="center" valign="middle" class="select-tr-right">
+2</td></tr>
+
+
+
+<tr valign="middle" id="arw32499566">
+<td align="center" valign="top" class="select-tr-left"><a name="x32499566"></a>
+<font color="#00008f"><b>17.</b></font><br><input type="checkbox" name="tid32499566" id="tid32499566" onclick="if (this.checked) {RowSelect(&quot;arw32499566&quot;,1)} else {RowSelect(&quot;arw32499566&quot;,0)}"><div id="pdf_32499566" name="pdf_32499566"></div></td>
+<td align="left" valign="top">
+
+<a href="/item.asp?id=32499566"><b><span style="line-height:1.0;">ЭЛЕКТРОДИНАМИКА КВАНТОВОЙ ПЛАЗМЫ</span></b></a><br><font color="#00008f"><i>Бобылев Ю.В., Кузелев М.В., Панин В.А.</i></font><br>
+<font color="#00008f">
+Тула, 2017. 
+</font></td><td align="center" valign="middle" class="select-tr-right">
+0</td></tr>
+
+
+
+<tr valign="middle" id="arw30658502">
+<td align="center" valign="top" class="select-tr-left"><a name="x30658502"></a>
+<font color="#00008f"><b>18.</b></font><br><input type="checkbox" name="tid30658502" id="tid30658502" onclick="if (this.checked) {RowSelect(&quot;arw30658502&quot;,1)} else {RowSelect(&quot;arw30658502&quot;,0)}"><div id="pdf_30658502" name="pdf_30658502"><a href="javascript:load_article(30658502)"><img src="/images/download_green.png" width="16" vspace="3" border="0" title="Доступ к полному тексту открыт"></a>
+
+</div></td>
+<td align="left" valign="top">
+
+<a href="/item.asp?id=30658502"><b><span style="line-height:1.0;">К ЛИНЕЙНОЙ ТЕОРИИ ВЫНУЖДЕННОГО ЧЕРЕНКОВСКОГО ИЗЛУЧЕНИЯ РЕЛЯТИВИСТСКИМ ЭЛЕКТРОННЫМ ПУЧКОМ ПРОДОЛЬНЫХ ВОЛНВ КВАНТОВОЙ ПЛАЗМЕ</span></b></a><br><font color="#00008f"><i>Бобылев Ю.В., Кузелев М.В., Панин В.А.</i></font><br>
+<font color="#00008f">
+ В сборнике: МНОГОМАСШТАБНОЕ МОДЕЛИРОВАНИЕ СТРУКТУР, СТРОЕНИЕ ВЕЩЕСТВА, НАНОМАТЕРИАЛЫ И НАНОТЕХНОЛОГИИ.&nbsp;сборник материалов IV международной конференции. Тульский государственный педагогический университет им. Л. Н. Толстого. 2017.  С. 116-120.
+</font></td><td align="center" valign="middle" class="select-tr-right">
+0</td></tr>
+
+
+
+<tr valign="middle" id="arw44665274">
+<td align="center" valign="top" class="select-tr-left"><a name="x44665274"></a>
+<font color="#00008f"><b>19.</b></font><br><input type="checkbox" name="tid44665274" id="tid44665274" onclick="if (this.checked) {RowSelect(&quot;arw44665274&quot;,1)} else {RowSelect(&quot;arw44665274&quot;,0)}"><div id="pdf_44665274" name="pdf_44665274"></div></td>
+<td align="left" valign="top">
+
+<a href="/item.asp?id=44665274"><b><span style="line-height:1.0;">ПРОФИЛАКТИКА КОРРУПЦИОННЫХ ПРАВОНАРУШЕНИЙ В СТУДЕНЧЕСКОЙ СРЕДЕ (ИЗ ОПЫТА РАБОТЫ ТГПУ ИМ. Л.Н. ТОЛСТОГО)</span></b></a><br><font color="#00008f"><i>Панин В.А., Краюшкина С.В., Бутовский А.Ю.</i></font><br>
+<font color="#00008f">
+ В сборнике: Межведомственное взаимодействие при реализации мероприятий по противодействию коррупции в образовании.&nbsp;Материалы  Всероссийской научно-практической конференции. 2017.  С. 143-145.
+</font></td><td align="center" valign="middle" class="select-tr-right">
+0</td></tr>
+
+
+
+<tr valign="middle" id="arw44665287">
+<td align="center" valign="top" class="select-tr-left"><a name="x44665287"></a>
+<font color="#00008f"><b>20.</b></font><br><input type="checkbox" name="tid44665287" id="tid44665287" onclick="if (this.checked) {RowSelect(&quot;arw44665287&quot;,1)} else {RowSelect(&quot;arw44665287&quot;,0)}"><div id="pdf_44665287" name="pdf_44665287"></div></td>
+<td align="left" valign="top">
+
+<a href="/item.asp?id=44665287"><b><span style="line-height:1.0;">ПРОФИЛАКТИЧЕСКАЯ РАБОТА ПО ПРОТИВОДЕЙСТВИЮ ИДЕОЛОГИИ ТЕРРОРИЗМА И ЭКСТРЕМИЗМА В МОЛОДЕЖНОЙ СРЕДЕ КАК СОСТАВНАЯ ЧАСТЬ КОМПЛЕКСНОЙ БЕЗОПАСНОСТИ ОБРАЗОВАТЕЛЬНОЙ ОРГАНИЗАЦИИ (ИЗ ОПЫТА РАБОТЫ ТГПУ ИМ. Л.Н. ТОЛСТОГО)</span></b></a><br><font color="#00008f"><i>Панин В., Краюшкина С., Бутовский А.</i></font><br>
+<font color="#00008f">
+ В сборнике: Комплексная безопасность образовательных организаций: теория и практика.&nbsp;Материалы Всероссийская научно-практической конференции. под общ. ред. М. В. Дулясовой ; Пущинский государственный естественно-научный институт. 2017.  С. 153-156.
+</font></td><td align="center" valign="middle" class="select-tr-right">
+0</td></tr>
+
+
+
+</tbody></table>`
             }
         },
         mounted() {
@@ -77,36 +423,36 @@
             }
         },
         methods: {
-            async scrapping() {
-                this.isLoading = true;
-                let data = '';
-                var form_data = new FormData();
-                const requestBody = {
-                authors_all: '',
-                pagenum: null,
-                authorbox_name: null,
-                selid: null,
-                orgid: null,
-                orgadminid: null,
-                surname: null,
-                codetype: 'SPIN',
-                codevalue: '9042-5877',
-                town: null,
-                countryid: null,
-                orgname: null,
-                rubriccode: null,
-                metrics: 1,
-                sortorder: 0,
-                order: 0
-                }
+            // async getScrappingHtml() {
+            //     this.isLoading = true;
+            //     let data = '';
+            //     var form_data = new FormData();
+            //     const requestBody = {
+            //     authors_all: '',
+            //     pagenum: null,
+            //     authorbox_name: null,
+            //     selid: null,
+            //     orgid: null,
+            //     orgadminid: null,
+            //     surname: null,
+            //     codetype: 'SPIN',
+            //     codevalue: '9042-5877',
+            //     town: null,
+            //     countryid: null,
+            //     orgname: null,
+            //     rubriccode: null,
+            //     metrics: 1,
+            //     sortorder: 0,
+            //     order: 0
+            //     }
 
-                for ( var key in requestBody ) {
-                form_data.append(key, requestBody[key]);
-                }
-                data = await API.createResource(APIServiceResource.ResourceType.scrapping, requestBody);
-                console.log(await data);
-                this.isLoading = false;
-            },
+            //     for ( var key in requestBody ) {
+            //     form_data.append(key, requestBody[key]);
+            //     }
+            //     data = await API.createResource(APIServiceResource.ResourceType.scrapping, requestBody);
+            //     console.log(await data);
+            //     this.isLoading = false;
+            // },
             async saveChanges() {
                 this.isLoading = true;
 
@@ -137,6 +483,40 @@
                 const month = (formattedDate.getMonth()+1) < 10 ? '0'+(formattedDate.getMonth()+1) : formattedDate.getMonth();
                 const day= formattedDate.getDate() < 10 ? '0'+formattedDate.getDate() : formattedDate.getDate();
                 return `${day}.${month}.${formattedDate.getFullYear()}`;
+            },
+            scrapping() {
+                const $ = cheerio.load(this.eLibResponse);
+                const fio = $('#restab td[align="left"] font[color="#00008f"] b').text();
+                const count = $('#restab a[title="Список публикаций данного автора в РИНЦ"]').text();
+                const linkToArticles = $('#restab a[title="Список публикаций данного автора в РИНЦ"]').attr('href');
+                const link = 'https://www.elibrary.ru/'+ linkToArticles;
+                const name = fio.split(' ')[1];
+                const lastName = fio.split(' ')[0];
+                if (this.content.name.toLowerCase() !== name.replace(/\s/g, '').toLowerCase()) {
+                    alert('инициалы не совпадают');
+                }
+                if (this.content.lastname.toLowerCase() !== lastName.replace(/\s/g, '').toLowerCase()) {
+                    alert('инициалы не совпадают');
+                }
+                console.log(count, link, lastName, name);
+                
+            },
+            scrapeArticles() {
+                const $ = cheerio.load(this.eLibArticles);
+                const articles = $('#restab tr[valign="middle"] td[align="left"]');
+                let parsedArticles=[];
+
+               for(let article of articles) {
+                   parsedArticles.push({ 
+                       title: article.children[1].children[0].children[0].children[0].data, 
+                       text:article.children[6].children[0].data, 
+                       link: article.children[1].attribs.href.split('\n').join(''), 
+                       authors: articles[1].children[3].children[0].children[0].data 
+                    })
+               }
+               
+                console.log(parsedArticles);
+                
             }
         }
        
@@ -150,6 +530,38 @@
         &__main-info {
             input {
                 width: 22rem !important;
+            }
+        }
+
+        .rinc {
+            background-color: rgba(223, 236, 223, 0.664);
+            padding: 2rem 3rem;
+            border-radius: 20px;
+            width: 90%;
+            border: 1px solid #47725157;
+
+            &__title {
+                font-size: 1.8rem;
+                font-weight: bold;
+                color: #283d2d;
+                margin-bottom: 3rem;
+            }
+
+            &__content {
+                display: flex;
+                font-size: 1.5rem;
+            }
+
+            &__input {
+                display: flex;
+
+                .profile-button {
+                    margin-top: 0;
+                    padding: 0.5rem 1.2rem;
+                    margin-left: 2rem;
+                    font-size: 1.4rem;
+                }
+
             }
         }
 
