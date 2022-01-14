@@ -76,7 +76,8 @@ export default  ({
 }
 .edit{
     width:100%;
-    height:64rem;
+    height:auto;
+    min-height: 64rem;
     position: relative;
     .pagination{
         margin-top:3rem;

@@ -1,5 +1,5 @@
 <template>
-    <div class="table-item">
+    <div class="table-item" :class="{'table-item_link': card.link}">
         <div class="table-title">
             {{card.title}}
         </div>
@@ -34,10 +34,14 @@
         display: flex;
         justify-content: space-between;
         font-size: 2rem;
-        padding: 2rem 0 1rem;
+        padding: 2rem 1rem 1rem;
         background: #ffffff61;
         align-items: center;
         border-bottom: 1px solid lightgray;
+
+        &_link {
+            background-color: #f4fef4;
+        }
 
         * {
             width: 30%;
@@ -47,7 +51,13 @@
         .stars {
             width: 20%;
         }
+        .table-title {
+            text-transform: lowercase;
 
+            &:first-letter {
+                text-transform: uppercase;
+            }
+        }
         .delete-button {
             width: 10%;
             cursor: pointer;

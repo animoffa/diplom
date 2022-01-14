@@ -138,7 +138,7 @@ export default  ({
 <style lang="less">
 .edit{
     width:100%;
-    height:64rem;
+    height:auto;
     position: relative;
     .pagination{
         margin-top:3rem;

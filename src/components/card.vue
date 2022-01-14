@@ -1,9 +1,17 @@
 <template>
-    <div class="flipcard h" v-bind:class="{deleteSide: isDeleteClicked}" v-on:click="openMore">
-        <div class="card front">
+    <div class="flipcard h" v-on:click="openMore">
+        <div class="card front" :class="{card_link: card.link }">
+            <a  v-if="card.link" :href="'https://www.elibrary.ru'+card.link" target="_blank">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="card_link__img">
+                <path d="M16.6643 12.7782V17.4447C16.6643 17.8573 16.5005 18.2529 16.2088 18.5446C15.9172 18.8363 15.5216 19.0002 15.1091 19.0002H6.55525C6.14277 19.0002 5.74719 18.8363 5.45552 18.5446C5.16386 18.2529 5 17.8573 5 17.4447V8.88948C5 8.47694 5.16386 8.08129 5.45552 7.78958C5.74719 7.49787 6.14277 7.33398 6.55525 7.33398H11.221" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M14.332 5H18.9978V9.66642" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M10.4453 13.555L18.9991 5" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            </a>
+
             <p class="title">{{card.title}}</p>
-            <p class="subtitle">{{card.author.name}} {{card.author.lastname}}</p>
-            <p class="preview" v-html="card.text"></p>
+            <p class="subtitle">{{card.author.name}} {{card.author.lastname}}<span v-if="card.other_authors"> и др.</span></p>
+            <p v-if="!card.link" class="preview" v-html="card.text"></p>
             <div class="actions">
                 <div class="card__likes">
                 <div class="star" :class="{'liked':isUserLikedArticle()}">★</div>
@@ -77,6 +85,18 @@
         align-items: flex-start;
         padding: 4.5rem 3rem 4rem;
 
+        &_link {
+            background-color: #f4fef4;
+
+            &__img {
+                stroke: #79997f;
+                position: absolute;
+                top: 1.2rem;
+                left: auto;
+                right: 1.5rem;
+                
+            }
+        }
         .star {
             color: #dcdcdc;
             cursor: pointer;
@@ -146,7 +166,13 @@
             font-size: 2.2rem;
             font-weight: 600;
             color: #27382b;
+            text-transform: lowercase;
             margin-bottom: 0.3rem;
+            display: -webkit-box;
+            line-height: 1.5;
+            -webkit-line-clamp: 5;
+            -webkit-box-orient: vertical;  
+            overflow: hidden;
 
             &:first-letter {
                 text-transform: uppercase;

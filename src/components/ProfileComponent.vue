@@ -22,21 +22,24 @@
                 <p>Адрес: <span v-show="showEdit">{{content.address}}</span><input v-show="!showEdit" v-model="content.address" autocomplete="off"/></p>
                 <p>Количество статей: <span >{{countOfArticle}}</span></p>
                 <p>О себе: <span v-show="showEdit">{{content.about}}</span><textarea v-show="!showEdit" v-model="content.about" autocomplete="off"/></p>
-                <div class="profile-button modal-button" v-if="!isFriendPage" @click="scrapeArticles">scrapping</div>
+
+
+                <!-- <div class="profile-button modal-button" v-if="!isFriendPage" @click="scrapeArticles">scrapping</div> -->
+                <div class="rinc" v-if="!isFriendPage">
+                    <p class="rinc__title">Введите свой spin-код для того, что бы получить доступ к своим публикациям включенным в РИНЦ</p>
+                    <div class="rinc__content">SPIN-код: 
+                    <span v-show="showEdit && content.spin">{{content.spin}}</span>
+                <div class="rinc__input"><input v-model="content.spin" autocomplete="off"/><div class="profile-button modal-button"  @click="scrapping">найти</div></div></div>
+        </div>
         </div>
         <button class="profile-button modal-button" @click="saveChanges" v-show="!showEdit">Сохранить</button>
         <div class="edit-button" v-if="!isFriendPage" @click="showEdit=!showEdit"/>
-        <div class="rinc" v-if="!isFriendPage">
-            <p class="rinc__title">Введите свой spin-код для того, что бы получить доступ к своим публикациям включенным в РИНЦ</p>
-            <div class="rinc__content">SPIN-код: 
-            <span v-show="showEdit && content.spin">{{content.spin}}</span>
-            <div class="rinc__input"><input v-model="content.spin" autocomplete="off"/><div class="profile-button modal-button"  @click="scrapping">найти</div></div></div>
-        </div>
+        
     </div>
 </template>
 <script>
     import AuthAPI from "@/services/APIServiceAuth.js"
-    // import API, {APIServiceResource} from "@/services/APIServiceResource.js"
+    import API, {APIServiceResource} from "@/services/APIServiceResource.js"
     import {mapState} from 'vuex'
     import Vue from "vue"
     import VueMask from 'v-mask'
@@ -464,6 +467,7 @@
 
                 await AuthAPI.editUser(this.content);
                 this.isLoading = false;
+                this.saveChanges();
             },
             uploadImage(event) {
                 this.image_file = event.target.files[0];
@@ -485,6 +489,7 @@
                 return `${day}.${month}.${formattedDate.getFullYear()}`;
             },
             scrapping() {
+
                 const $ = cheerio.load(this.eLibResponse);
                 const fio = $('#restab td[align="left"] font[color="#00008f"] b').text();
                 const count = $('#restab a[title="Список публикаций данного автора в РИНЦ"]').text();
@@ -501,21 +506,32 @@
                 console.log(count, link, lastName, name);
                 
             },
-            scrapeArticles() {
+            async scrapeArticles() {
                 const $ = cheerio.load(this.eLibArticles);
                 const articles = $('#restab tr[valign="middle"] td[align="left"]');
                 let parsedArticles=[];
+                const now = new Date();
 
                for(let article of articles) {
                    parsedArticles.push({ 
+                       author: this.content,
+                       date: now.toISOString(),
                        title: article.children[1].children[0].children[0].children[0].data, 
-                       text:article.children[6].children[0].data, 
+                       text: article.children[6].children[0].data, 
                        link: article.children[1].attribs.href.split('\n').join(''), 
-                       authors: articles[1].children[3].children[0].children[0].data 
+                       other_authors: articles[1].children[3].children[0].children[0].data 
                     })
                }
                
                 console.log(parsedArticles);
+                parsedArticles.forEach(async (article)=> {
+                    try {
+                        await API.createResource(APIServiceResource.ResourceType.articles, article)
+                        this.$emit('fetch-cards');
+                    } catch (e) {
+                        console.error("Error while fetching: " + e.toString());
+                    }
+                })
                 
             }
         }
@@ -536,8 +552,9 @@
         .rinc {
             background-color: rgba(223, 236, 223, 0.664);
             padding: 2rem 3rem;
+            margin-top: 5rem;
             border-radius: 20px;
-            width: 90%;
+            width: 65%;
             border: 1px solid #47725157;
 
             &__title {
