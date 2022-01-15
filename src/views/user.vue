@@ -1,6 +1,6 @@
 <template>
     <div class="user-template">
-        <template  v-if="!(user && user.name)">
+        <template  v-if="!(user && user.id)">
            <Preloader/>
         </template>
         <template v-else>

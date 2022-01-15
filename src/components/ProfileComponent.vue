@@ -18,21 +18,30 @@
             </div>
             <div class="profile__full-info">
                 <p>E-mail: <a v-show="showEdit" :href="'mailto:'+content.email">{{content.email}}</a><input v-show="!showEdit" v-model="content.email" autocomplete="off"/></p>
-                <p>Телефон: <a v-show="showEdit" :href="'tel:'+content.phone">{{content.phone}}</a><input v-show="!showEdit" v-model="content.phone" autocomplete="off"/></p>
+                <p>Телефон: <a v-show="showEdit" :href="'tel:'+content.phone">{{content.phone}}</a><input v-show="!showEdit" v-model="content.phone" autocomplete="off" v-mask="'+7 (###) ### - ## - ##'" /></p>
                 <p>Адрес: <span v-show="showEdit">{{content.address}}</span><input v-show="!showEdit" v-model="content.address" autocomplete="off"/></p>
                 <p>Количество статей: <span >{{countOfArticle}}</span></p>
                 <p>О себе: <span v-show="showEdit">{{content.about}}</span><textarea v-show="!showEdit" v-model="content.about" autocomplete="off"/></p>
 
 
-                <!-- <div class="profile-button modal-button" v-if="!isFriendPage" @click="scrapeArticles">scrapping</div> -->
+                <!-- <div class="profile-button modal-button" v-if="!isFriendPage" @click="getScrappingHtml">scrapping</div> -->
                 <div class="rinc" v-if="!isFriendPage">
-                    <p class="rinc__title">Введите свой spin-код для того, что бы получить доступ к своим публикациям включенным в РИНЦ</p>
+                    <p v-show="!content.spin" class="rinc__title">Введите свой spin-код для того, что бы получить доступ к своим публикациям включенным в РИНЦ</p>
+                    <p v-show="content.spin" class="rinc__title">Ваш SPIN-код подтвержден, теперь вам доступна функция импорта статей!</p>
                     <div class="rinc__content">SPIN-код: 
                     <span v-show="showEdit && content.spin">{{content.spin}}</span>
-                <div class="rinc__input"><input v-model="content.spin" autocomplete="off"/><div class="profile-button modal-button"  @click="scrapping">найти</div></div></div>
+                    <div v-show="!showEdit || !content.spin" class="rinc__input"><input v-model="spin" autocomplete="off" v-mask="'####-####'"/><div class="profile-button modal-button"  @click="getScrappingHtml">найти</div></div>
+                    
+                </div>
+                <div v-show="content.spin && !content.is_articles_uploaded" class="rinc__found">
+                        <span>Найдено {{countOfArticles}} статей, посмотреть их можно</span> <a :href="linkForArticles" target="_blank">по ссылке</a> <div class="profile-button modal-button" v-if="!isFriendPage" @click="scrapeArticles">Выгрузить</div>
+                </div>
+                <div v-show="content.spin && content.is_articles_uploaded" class="rinc__found">
+                        <span>Статьи успешно выгружены!</span>
+                </div>
+                </div>
         </div>
-        </div>
-        <button class="profile-button modal-button" @click="saveChanges" v-show="!showEdit">Сохранить</button>
+        <button class="profile-button modal-button" @click="saveChanges" v-show="!showEdit">Сохранить</button> 
         <div class="edit-button" v-if="!isFriendPage" @click="showEdit=!showEdit"/>
         
     </div>
@@ -53,6 +62,9 @@
             return {
                 showEdit: "false",
                 image_file: null,
+                spin: '',
+                countOfArticles: 0,
+                linkForArticles: '',
                 isFriendPage: false,
                 friendId: 0, 
                 birthday: '',
@@ -416,7 +428,6 @@
             content() {
                 console.log(this.isFriendPage, 'this.isFriendPage')
                 if (this.isFriendPage) {
-                    console.log(this.allUsers.find(user => console.log(user.id,+this.friendId )), 'this.allUsers.find(user => user.id === this.friendId)')
                     return this.allUsers.find(user => user.id === +this.friendId)
                 }
                 return this.user;
@@ -426,36 +437,16 @@
             }
         },
         methods: {
-            // async getScrappingHtml() {
-            //     this.isLoading = true;
-            //     let data = '';
-            //     var form_data = new FormData();
-            //     const requestBody = {
-            //     authors_all: '',
-            //     pagenum: null,
-            //     authorbox_name: null,
-            //     selid: null,
-            //     orgid: null,
-            //     orgadminid: null,
-            //     surname: null,
-            //     codetype: 'SPIN',
-            //     codevalue: '9042-5877',
-            //     town: null,
-            //     countryid: null,
-            //     orgname: null,
-            //     rubriccode: null,
-            //     metrics: 1,
-            //     sortorder: 0,
-            //     order: 0
-            //     }
-
-            //     for ( var key in requestBody ) {
-            //     form_data.append(key, requestBody[key]);
-            //     }
-            //     data = await API.createResource(APIServiceResource.ResourceType.scrapping, requestBody);
-            //     console.log(await data);
-            //     this.isLoading = false;
-            // },
+            async getScrappingHtml() {
+                this.isLoading = true;
+                // let data;
+                //9042-5877
+                // data = await API.createResource(APIServiceResource.ResourceType.scrapping, this.content.spin);
+                // this.eLibResponse = await data.text();
+                console.log(this.content.spin);
+                this.scrapping();
+                this.isLoading = false;
+            },
             async saveChanges() {
                 this.isLoading = true;
 
@@ -489,7 +480,6 @@
                 return `${day}.${month}.${formattedDate.getFullYear()}`;
             },
             scrapping() {
-
                 const $ = cheerio.load(this.eLibResponse);
                 const fio = $('#restab td[align="left"] font[color="#00008f"] b').text();
                 const count = $('#restab a[title="Список публикаций данного автора в РИНЦ"]').text();
@@ -497,12 +487,18 @@
                 const link = 'https://www.elibrary.ru/'+ linkToArticles;
                 const name = fio.split(' ')[1];
                 const lastName = fio.split(' ')[0];
-                if (this.content.name.toLowerCase() !== name.replace(/\s/g, '').toLowerCase()) {
+                if (this.content.name.replace(/\s/g, '').toLowerCase() !== name.replace(/\s/g, '').toLowerCase()) {
                     alert('инициалы не совпадают');
+                    return;
                 }
-                if (this.content.lastname.toLowerCase() !== lastName.replace(/\s/g, '').toLowerCase()) {
+                if (this.content.lastname.replace(/\s/g, '').toLowerCase() !== lastName.replace(/\s/g, '').toLowerCase()) {
                     alert('инициалы не совпадают');
+                    return;
                 }
+                this.content.spin = this.spin;
+                this.countOfArticles = count;
+                this.linkForArticles = link;
+                
                 console.log(count, link, lastName, name);
                 
             },
@@ -518,7 +514,7 @@
                        date: now.toISOString(),
                        title: article.children[1].children[0].children[0].children[0].data, 
                        text: article.children[6].children[0].data, 
-                       link: article.children[1].attribs.href.split('\n').join(''), 
+                       link: 'https://www.elibrary.ru/'+ article.children[1].attribs.href.split('\n').join(''), 
                        other_authors: articles[1].children[3].children[0].children[0].data 
                     })
                }
@@ -528,7 +524,10 @@
                     try {
                         await API.createResource(APIServiceResource.ResourceType.articles, article)
                         this.$emit('fetch-cards');
+                        this.content.is_articles_uploaded = true;
+                        this.saveChanges();
                     } catch (e) {
+                        alert('Произошла ошибка, попробуйте позже');
                         console.error("Error while fetching: " + e.toString());
                     }
                 })
@@ -557,6 +556,21 @@
             width: 65%;
             border: 1px solid #47725157;
 
+            span {
+                width: auto;
+            }
+
+            &__found {
+                margin-top: 3rem;
+                font-weight: bold;
+
+                .profile-button {
+                    margin-top: 2rem;
+                    cursor: pointer;
+                }
+            }
+            
+
             &__title {
                 font-size: 1.8rem;
                 font-weight: bold;
@@ -575,6 +589,7 @@
                 .profile-button {
                     margin-top: 0;
                     padding: 0.5rem 1.2rem;
+                    cursor: pointer;
                     margin-left: 2rem;
                     font-size: 1.4rem;
                 }
@@ -589,14 +604,14 @@
             line-height: 145%;
             font-size: 1.9rem;
             margin-left: 1rem;
-            bottom: 0.5rem;
+            bottom: 0rem;
             color:#27382b;
             transition:0.3s;
             cursor: pointer;
             position: relative;
             white-space: nowrap;
             &:hover{
-                color:#3CB3E7;
+                color:#54c552;
                 &::before{
                     width: 100%;
                 }
@@ -612,7 +627,7 @@
             width: 20px;
             box-sizing: border-box;
             }
-            &:before {
+            &:before {  
                 content: '';
                 bottom: 0;
                 display: block;
@@ -620,7 +635,7 @@
                 width: 0;
                 right: 0;
                 height: 1px;
-                background-color: #3CB3E7;
+                background-color: #56d853;
                 transition: 0.3s ease;
             }
 

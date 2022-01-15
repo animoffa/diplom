@@ -1,11 +1,11 @@
 <template>
     <div :class="{modalBack:isOpen}">
         <div class="books-container">
-            <Card v-for="(card,i) in cards" :key="i" :card="card"
+            <Card v-for="(card,i) in displayedPosts" :key="i" :card="card"
                   v-scroll="onPageDown" v-on:scroll="onPageDown"
                   @open-more="openMore" class="card-container" :user="user"/>
         </div>
-        <!-- <div class="more-cards" id="more" @click="showMore">Показать ещё</div> -->
+        <div class="more-cards" id="more" @click="showMore" v-if="page < pages.length">Показать ещё</div>
         <div class="add-card" id="show-modal" @click="showModal">+</div>
 
         <modal-window ref="addBookModal">
@@ -44,6 +44,7 @@
                         <div class="title"> {{card.title}}</div>
                         <div class="subtitle"> {{card.author.name}} {{card.author.lastname}}</div>
                         <p class="article__body" v-html="card.text"></p>
+                        <strong v-if="card.link" class="article__body">Полный текст статьи доступен <a :href="card.link" target="_blank">по ссылке</a></strong>
                         <div class="mark-container">
                             <div class="mark__my">
                                 <span>Оцените статью: </span>
@@ -117,6 +118,8 @@
                 card: {},
                 search: '',
                 page: 1,
+                perPage: 20,
+                pages: [],
                 userMark: false,
 
             }
@@ -134,6 +137,11 @@
             user: {
                 type: Object,
                 default:()=> {}
+            }
+        },
+        computed: {
+            displayedPosts() {
+                return this.paginate(this.cards);
             }
         },
         directives: {
@@ -157,6 +165,7 @@
 
         mounted() {
             this.onPageDown();
+            this.setPages();
         },
         methods: {
             formatDate(date) {
@@ -170,13 +179,6 @@
             },
             showMore() {
                 this.page += 1;
-                //const tab = this.$route.query.list || 'popular';
-                
-                // this.$accessor.bonuses.getBonusData({
-                //     page,
-                //     tab: tab,
-                //     overwrite: overwriteBonusCards,
-                // });
 
             },
             onPageDown(e, element) {
@@ -188,20 +190,6 @@
                 }
                 return isScrolledIntoView(element)
             },
-            // setLikeOnComment(i) {
-            //     this.card.comments.forEach((comment) => {
-            //        if (comment.text===i.text) {
-            //            comment.likes++;
-            //        }
-            //     })
-            // },
-            // setDislikeOnComment(i) {
-            //     this.card.comments.forEach((comment) => {
-            //        if (comment.text===i.text) {
-            //            comment.dislikes++;
-            //        }
-            //     })
-            // },
 
             async changeMark() {
                     const res = await API.updateResourceID(APIServiceResource.ResourceType.articles, this.card.id, {} );
@@ -253,8 +241,27 @@
 
                 }
             },
+            setPages() {
+                let numberOfPages = Math.ceil(this.cards.length / this.perPage);
+                this.pages = [];
+                for (let index = 1; index <= numberOfPages; index++) {
+                    this.pages.push(index);
+                }
+            },
+            paginate(cards) {
+                let page = this.page;
+                let perPage = this.perPage;
+                //let fromq = (page * perPage) - perPage;
+                let to = (page * perPage);
+                return cards.slice(0, to);
+            },
+    },
+    watch: {
+        cards() {
+            this.setPages();
+        }
+    },
 
-        },
     }
 
 
@@ -312,7 +319,7 @@
             line-height: 145%;
             font-size: 1.9rem;
             margin-left: 1rem;
-            bottom: 0.5rem;
+            bottom: 0rem;
             color:#27382b;
             transition:0.3s;
             cursor: pointer;
@@ -320,7 +327,7 @@
             white-space: nowrap;
 
             &:hover{
-                color:#3CB3E7;
+                color:#54c552;
                 &::before{
                     width: 100%;
                 }
@@ -345,7 +352,7 @@
                 width: 0;
                 right: 0;
                 height: 1px;
-                background-color: #3CB3E7;
+                background-color: #56d853;
                 transition: 0.3s ease;
             }
 

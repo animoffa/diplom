@@ -65,7 +65,7 @@
 
                         try {
 
-                            await API.register({email: this.login, password: this.password, name: this.name, lastname: this.lastName, company: this.company, phone: '454545'});
+                            await API.register({email: this.login, password: this.password, name: this.name, lastname: this.lastName, company: this.company});
                             await this.$router.push('/login')
                         } catch (e) {
                             console.error("Error while auth: " + e.toString());
