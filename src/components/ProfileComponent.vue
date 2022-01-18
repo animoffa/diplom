@@ -34,7 +34,7 @@
                     
                 </div>
                 <div v-show="content.spin && !content.is_articles_uploaded" class="rinc__found">
-                        <span>Найдено {{countOfArticles}} статей, посмотреть их можно</span> <a :href="linkForArticles" target="_blank">по ссылке</a> <div class="profile-button modal-button" v-if="!isFriendPage" @click="scrapeArticles">Выгрузить</div>
+                        <span>Найдено {{countOfArticles}} статей, посмотреть их можно</span> <a :href="linkForArticles" target="_blank">по ссылке</a> <div class="profile-button modal-button" v-if="!isFriendPage" @click="getScrappingArticles">Выгрузить</div>
                 </div>
                 <div v-show="content.spin && content.is_articles_uploaded" class="rinc__found">
                         <span>Статьи успешно выгружены!</span>
@@ -64,6 +64,7 @@
                 image_file: null,
                 spin: '',
                 countOfArticles: 0,
+                rincInfo: {},
                 linkForArticles: '',
                 isFriendPage: false,
                 friendId: 0, 
@@ -406,7 +407,7 @@
 
 
 
-</tbody></table>`
+</tbody></table>`,
             }
         },
         mounted() {
@@ -439,11 +440,10 @@
         methods: {
             async getScrappingHtml() {
                 this.isLoading = true;
-                // let data;
+                let data;
                 //9042-5877
-                // data = await API.createResource(APIServiceResource.ResourceType.scrapping, this.content.spin);
-                // this.eLibResponse = await data.text();
-                console.log(this.content.spin);
+                data = await API.createResource(APIServiceResource.ResourceType.scrapping, this.spin);
+                this.eLibResponse = await data.text();
                 this.scrapping();
                 this.isLoading = false;
             },
@@ -484,8 +484,10 @@
                 const fio = $('#restab td[align="left"] font[color="#00008f"] b').text();
                 const count = $('#restab a[title="Список публикаций данного автора в РИНЦ"]').text();
                 const linkToArticles = $('#restab a[title="Список публикаций данного автора в РИНЦ"]').attr('href');
+                const author_id = $('#restab tr[bgcolor="#f5f5f5"]').attr('id');
                 const link = 'https://www.elibrary.ru/'+ linkToArticles;
                 const name = fio.split(' ')[1];
+                const middleName = fio.split(' ')[2];
                 const lastName = fio.split(' ')[0];
                 if (this.content.name.replace(/\s/g, '').toLowerCase() !== name.replace(/\s/g, '').toLowerCase()) {
                     alert('инициалы не совпадают');
@@ -495,28 +497,49 @@
                     alert('инициалы не совпадают');
                     return;
                 }
+                
                 this.content.spin = this.spin;
                 this.countOfArticles = count;
                 this.linkForArticles = link;
-                
-                console.log(count, link, lastName, name);
+
+                this.rincInfo.id=author_id.substring(1);
+                this.rincInfo.fio=lastName+name[0]+' '+middleName[0];
+                this.rincInfo.pageCount=Math.ceil(this.countOfArticles/20);
                 
             },
-            async scrapeArticles() {
-                const $ = cheerio.load(this.eLibArticles);
+            async getScrappingArticles() {
+                this.isLoading = true;
+                
+                let data;
+                let htmlArticles = [];
+                data = await API.createResource(APIServiceResource.ResourceType.scrapeArticles, this.rincInfo);
+                htmlArticles.push(await data.text());
+                
+
+                console.log(htmlArticles);
+                    htmlArticles.forEach((article)=>{
+                        console.log(article);
+                        this.scrapeArticles(article)
+                    })
+            },
+            async scrapeArticles(article) {
+                const $ = cheerio.load(article);
                 const articles = $('#restab tr[valign="middle"] td[align="left"]');
                 let parsedArticles=[];
                 const now = new Date();
 
                for(let article of articles) {
+                   console.log(article);
+                   if (!article.children[1].children[0].children[0].data) {
                    parsedArticles.push({ 
                        author: this.content,
                        date: now.toISOString(),
-                       title: article.children[1].children[0].children[0].children[0].data, 
-                       text: article.children[6].children[0].data, 
+                       title: article.children[1].children[0].children[0].data ? 'Без названия' : article.children[1].children[0].children[0].children[0].data, 
+                       text: article.children[6] ? article.children[6].children[0].data : (article.children[4].children[0].data ? article.children[4].children[0].data : article.children[4].children[0].children[0].data), 
                        link: 'https://www.elibrary.ru/'+ article.children[1].attribs.href.split('\n').join(''), 
-                       other_authors: articles[1].children[3].children[0].children[0].data 
+                       other_authors: 'yes' 
                     })
+                   }
                }
                
                 console.log(parsedArticles);

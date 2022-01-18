@@ -58,7 +58,7 @@ export class APIServiceResource {
         DELETE: () => ({method: 'DELETE', headers: APIServiceResource.MethodType.getHeaders()}),
     };
 
-    static ResourceType = {articles: 'articles', users: 'users', comment: 'comment', scrapping: 'scrapping'};
+    static ResourceType = {articles: 'articles', users: 'users', comment: 'comment', scrapping: 'scrapping', scrapeArticles: 'scrapeArticles'};
 }
 
 export default new APIServiceResource('http://localhost:8080');
