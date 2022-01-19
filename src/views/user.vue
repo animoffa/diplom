@@ -95,6 +95,13 @@
         },
 
         methods: {
+             async redirectToLogin() {
+                try {
+                    await this.$router.push('/login');
+                } catch (e) {
+                    console.error("Error while fetching: " + e.toString());
+                }
+            },
             setTab() {
                 if (this.$route.query.tab && this.$route.query.tab.includes('user')) {
                 setTimeout(()=> {
