@@ -42,7 +42,7 @@
                 <form>
                     <div class="modal-body">
                         <div class="title"> {{card.title}}</div>
-                        <div class="subtitle"> {{card.author.name}} {{card.author.lastname}}</div>
+                        <div class="subtitle"><a  :href="user.id ===item.author.id ? '/user?tab=profile':'/user?tab=user'+item.author.id"> {{card.author.name}} {{card.author.lastname}}</a></div>
                         <p class="article__body" v-html="card.text"></p>
                         <strong v-if="card.link" class="article__body">Полный текст статьи доступен <a :href="card.link" target="_blank">по ссылке</a></strong>
                         <div class="mark-container">
@@ -65,11 +65,11 @@
                             <li class="open-book__li" v-for="(item,i) of card.commentList" :key="i"
                             >
                                 <div class="open-book__img">
-                                    <img v-if="user && user.img" :src="user.img"/>
+                                    <img v-if="item && item.img" :src="item.img"/>
                                     <img v-else src="../assets/img/user.png"/>
                                 </div>
                                 <div class="open-book__content">
-                                <p class="open-book__author">{{item.author && item.author.name}} {{item.author && item.author.lastname}}</p>
+                                <p class="open-book__author"><a :href="user.id ===item.author.id ? '/user?tab=profile':'/user?tab=user'+item.author.id">{{item.author && item.author.name}} {{item.author && item.author.lastname}}</a></p>
                                 <span>{{item.text.substr(1).slice(0, -1) }}</span>
                                 <div class="open-book__buttons">
                                     

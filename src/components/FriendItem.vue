@@ -27,9 +27,6 @@
         },
         props: ["user", 'countOfArticles'],
         methods: {
-            deleteFriend() {
-                this.$emit('delete-card', this.user.id);
-            },
             openFriendPage(id) {
                 this.$emit('open-friend-page', id)
             }

@@ -32,7 +32,7 @@
                     <ul>
                         <li v-for="(item,i) of sidebarList" :key="'sidebar'+i" :class="{'active': item.query===activeTab}"  @click="changeTab(item.query)" class="sidebar__item">
                             {{item.name}}
-                            <div v-if="item.isDeletable" class="sidebar__delete-btn" @click="deleteSidebarItem(i)">╳</div>
+                            <div v-if="item.isDeletable" class="sidebar__delete-btn" @click.stop="deleteSidebarItem(i)">╳</div>
                         </li>
                     </ul>
 
@@ -54,13 +54,17 @@
     import ProfileComponent from '@/components/ProfileComponent';
     import EditArticles from '@/components/EditArticles';
     import FriendsComponent from '@/components/FriendsComponent';
+    import ChartComponent from '@/components/ChartComponent';
     import Preloader from '@/components/preloader';
     import { mapState } from 'vuex';
 
     export default {
         data() {
             return {
-                sidebarList:[{name:'Профиль', query:'profile'}, {name:'Редактирование статей', query:'myArticles'}, {name: 'Коллеги', query: 'colleagues'}],
+                sidebarList:[{name:'Профиль', query:'profile'}, 
+                {name:'Редактирование статей', query:'myArticles'}, 
+                {name: 'Коллеги', query: 'colleagues'},
+                {name:'Статистика', query: 'chart'}],
                 isLoading: false,
                 activeTab: 'profile',
 
@@ -71,9 +75,11 @@
         },
 
         async mounted() {
-            if (this.$route.query.tab) {
-                this.activeTab = this.$route.query.tab;
+            this.setTab();
+            if (localStorage.getItem('sidebar')){
+                this.sidebarList = JSON.parse(localStorage.getItem('sidebar'));
             }
+           
             if (!localStorage.getItem("token")) {
                 this.redirectToLogin();
                 return;
@@ -85,13 +91,42 @@
             this.$store.dispatch('articles/getArticles');
         },
         computed: {
-            ...mapState('client', ['user']),  
+            ...mapState('client', ['user','allUsers']),  
         },
 
         methods: {
+            setTab() {
+                if (this.$route.query.tab && this.$route.query.tab.includes('user')) {
+                setTimeout(()=> {
+                    
+                    const user = this.allUsers.find((user)=>{
+                    return user.id.toString() === this.$route.query.tab.replace(/^.{4}/, '')
+                    });
+                    
+                    const hasThisUser = this.sidebarList.find((thisUser)=>{
+                        return thisUser.query.replace(/^.{4}/, '') === user.id.toString()
+                        })
+                   
+                    if (typeof hasThisUser == 'undefined') {
+                        this.sidebarList.push({name:`${user.name} ${user.lastname}`, query:`user${user.id}`, isDeletable: true})
+                        localStorage.setItem('sidebar', JSON.stringify(this.sidebarList))
+                    }
+                }, 1000)
+            }
+             if (this.$route.query.tab) {
+                this.activeTab = this.$route.query.tab;
+            }
+            },
             openColleguePage(user) {
-                this.sidebarList.push({name:`${user.name} ${user.lastname}`, query:`user${user.id}`, isDeletable: true})
-                this.changeTab(`user${user.id}`);
+                const hasThisUser = this.sidebarList.find((thisUser)=>{
+                        return thisUser.query.replace(/^.{4}/, '') === user.id.toString()
+                        })
+                   
+                    if (typeof hasThisUser == 'undefined') {
+                        this.sidebarList.push({name:`${user.name} ${user.lastname}`, query:`user${user.id}`, isDeletable: true})
+                        localStorage.setItem('sidebar', JSON.stringify(this.sidebarList))
+                        this.changeTab(`user${user.id}`);
+                    }
             },
             fetchCards() {
               this.$store.dispatch('articles/getArticles');
@@ -99,6 +134,7 @@
             deleteSidebarItem(id) {
                 this.changeTab('profile');
                 this.sidebarList.splice(id,1);
+                localStorage.setItem('sidebar', JSON.stringify(this.sidebarList))
             },
             exit() {
                 localStorage.removeItem("token");
@@ -115,6 +151,8 @@
                         return EditArticles;
                     case 'colleagues':
                             return FriendsComponent;
+                    case 'chart':
+                            return ChartComponent;
                     default:
                         return ProfileComponent;
                 }
