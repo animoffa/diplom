@@ -356,7 +356,7 @@
         width: 100%;
         height:100%;
         z-index: -1;
-        opacity: 0.1;
+        opacity: 0.05;
         right: 0;
         bottom: 0;
         background-image: url(../src/assets/img/bg2.jpg);

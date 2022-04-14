@@ -15,7 +15,6 @@ export class APIServiceResource {
 
     getResources(resourceName) {
         this.isResourceExists(resourceName);
-        console.log(APIServiceResource.MethodType.GET());
         return this.fetch(APIServiceResource.MethodType.GET(), APIServiceResource.ResourceType[resourceName]);
     }
 

@@ -17,7 +17,7 @@
   </div>
   <div class="small">
     <line-chart :chart-data="datacollection" :width="width"></line-chart>
-    <button @click="fillData()">Randomize</button>
+    <button class="button" style="margin-top: 30px;" @click="fillData()">Применить</button>
   </div>
 </div>
 </template>
@@ -141,7 +141,7 @@
           labels: this.perMonth ? this.allDays : this.allMonths,
           datasets: [
             {
-              label: 'Data One',
+              label: 'Количество опубликованных статей',
               backgroundColor: '#f87979',
               data: this.articlesCount
             },
@@ -160,12 +160,27 @@
       display: flex;
       align-items: center;
       justify-content: space-around;
+      margin-bottom: 20px;
     }
   }
   .small {
     width: 80%;
     margin: 0 auto;
     
+  }
+
+  .button {
+    left: 50%;
+    position: relative;
+    transform: translateX(-50%);
+    background-color: #477251;
+    color: #fff;
+    border: none;
+    text-align: center;
+    padding: 0.8rem 2rem;
+    font-size: 1.7rem;
+    font-weight: 500;
+    border-radius: 8px;
   }
 
   select {

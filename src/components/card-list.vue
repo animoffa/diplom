@@ -42,7 +42,7 @@
                 <form>
                     <div class="modal-body">
                         <div class="title"> {{card.title}}</div>
-                        <div class="subtitle"><a  :href="user.id ===item.author.id ? '/user?tab=profile':'/user?tab=user'+item.author.id"> {{card.author.name}} {{card.author.lastname}}</a></div>
+                        <div class="subtitle"><a  :href="user.id ===card.author.id ? '/user?tab=profile':'/user?tab=user'+card.author.id"> {{card.author.name}} {{card.author.lastname}}</a></div>
                         <p class="article__body" v-html="card.text"></p>
                         <strong v-if="card.link" class="article__body">Полный текст статьи доступен <a :href="card.link" target="_blank">по ссылке</a></strong>
                         <div class="mark-container">

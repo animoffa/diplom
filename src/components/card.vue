@@ -86,7 +86,7 @@
         padding: 4.5rem 3rem 4rem;
 
         &_link {
-            background-color: #f4fef4;
+            background-color: #f1f4f1;
 
             &__img {
                 stroke: #79997f;
