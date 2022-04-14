@@ -142,7 +142,7 @@
           datasets: [
             {
               label: 'Количество опубликованных статей',
-              backgroundColor: '#f87979',
+              backgroundColor: '#477251c4',
               data: this.articlesCount
             },
           ]
