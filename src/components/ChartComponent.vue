@@ -6,8 +6,8 @@
       <option :value="currentYear" selected>{{currentYear}}</option>
       <option :value="currentYear-1">{{currentYear - 1}}</option>
       <option :value="currentYear-2">{{currentYear - 2}}</option>
-      <option :value="currentYear+1">{{currentYear + 1}}</option>
-      <option :value="currentYear+2">{{currentYear + 2}}</option>
+      <option :value="currentYear+1">{{currentYear - 3}}</option>
+      <option :value="currentYear+2">{{currentYear - 4}}</option>
   </select>
   <select v-model="selectedMonth" :disabled="!perMonth">
       <option value="" hidden disabled selected>Выберите месяц..</option>
